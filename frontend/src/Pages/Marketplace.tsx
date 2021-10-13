@@ -1,11 +1,14 @@
 import React from 'react';
 import styled from 'styled-components';
+import { CardGrid } from '../Components/CardGrid';
 import { VectorBackground } from '../Components/VectorBackground';
 
 export const Marketplace: React.FC = () => {
   return (
     <Container>
-      <VectorBackground title={'Marketplace'}></VectorBackground>
+      <VectorBackground title={'Marketplace'}>
+        <CardGrid />
+      </VectorBackground>
     </Container>
   );
 };

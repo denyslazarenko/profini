@@ -2,7 +2,7 @@ import vector from '../assets/headerBackground.svg';
 import styled from 'styled-components';
 import { H1 } from './Text';
 
-export const VectorBackground: React.FC<{ title?: string }> = ({
+export const VectorBackground: React.FC<{ title: string }> = ({
   children,
   title
 }) => {
