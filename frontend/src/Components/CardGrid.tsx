@@ -5,14 +5,9 @@ import { Card } from './Card';
 export const CardGrid: React.FC<{ nfts: NFT[] }> = ({ nfts }) => {
   return (
     <Container>
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
-      <Card />
+      {nfts.map(nft => (
+        <Card nft={nft} />
+      ))}
     </Container>
   );
 };

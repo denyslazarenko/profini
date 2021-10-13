@@ -1,14 +1,14 @@
 import styled from 'styled-components';
 import { P } from './Text';
-import example from '../assets/diepold_example.png';
 import { Button } from './Button';
+import { NFT } from '../types';
 
-export const Card = () => {
+export const Card: React.FC<{ nft: NFT }> = ({ nft }) => {
   return (
     <Container>
-      <Image src={example} />
-      <Price>1 ETH</Price>
-      <Button>View</Button>
+      <Image src={nft.imageUrlOriginal} />
+      <Price>{nft.price || 'Sold for ' + nft.soldFor} ETH</Price>
+      <Button onClick={() => window.open(nft.openSeaUrl)}>View</Button>
     </Container>
   );
 };

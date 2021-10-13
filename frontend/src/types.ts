@@ -5,9 +5,10 @@ export interface NFT {
   description: string;
   owner: string;
   creator: string;
-  price: string;
+  price: number;
   buyOrder: any;
   sold: boolean;
-  soldFor: string | undefined;
+  soldFor: number | undefined;
+  openSeaUrl: string;
   raw: any;
 }

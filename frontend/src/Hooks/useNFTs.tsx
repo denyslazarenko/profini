@@ -31,31 +31,36 @@ export function useNFTs(): NFT[] {
         if (!asset.image_original_url) {
           setNfts([]);
         }
-        let price = '';
+        let price = 0;
         let sold = false;
         console.log('Assets', asset);
         if (asset.sell_orders) {
           if (asset.sell_orders[0]) {
             //price = web3.utils.fromWei(`${new Bignumber(asset.sell_orders[0].base_price).toNumber()}`, 'ether');
             console.log('Baseprice', asset.sell_orders[0].base_price);
-            price = BigNumber.from(asset.sell_orders[0].base_price).toString();
+            price =
+              parseInt(
+                BigNumber.from(asset.sell_orders[0].base_price).toString()
+              ) / 1e18;
           } else {
-            price = '0';
+            price = 0;
             sold = true;
           }
         } else {
-          price = '0';
+          price = 0;
           sold = true;
         }
         let owner;
-        let soldFor: string | undefined;
+        let soldFor: number | undefined;
         if (asset.owner.user) {
           if (asset.owner.user.username) {
             owner = asset.owner.user.username;
           }
         }
         if (asset.last_sale) {
-          soldFor = BigNumber.from(asset.last_sale.total_price).toString();
+          soldFor =
+            parseInt(BigNumber.from(asset.last_sale.total_price).toString()) /
+            1e18;
         }
         if (!owner) {
           owner = asset.owner.address;
@@ -87,6 +92,7 @@ export function useNFTs(): NFT[] {
           buyOrder,
           sold,
           soldFor,
+          openSeaUrl: asset.permalink,
           raw: asset
         });
       });
