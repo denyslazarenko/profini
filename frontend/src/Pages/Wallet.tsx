@@ -1,3 +1,5 @@
+import { VectorBackground } from '../Components/VectorBackground';
+
 export const Wallet: React.FC = () => {
-  return <div>Wallet</div>;
+  return <VectorBackground>Wallet</VectorBackground>;
 };
