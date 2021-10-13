@@ -1,7 +1,8 @@
 import styled from 'styled-components';
+import { NFT } from '../types';
 import { Card } from './Card';
 
-export const CardGrid = () => {
+export const CardGrid: React.FC<{ nfts: NFT[] }> = ({ nfts }) => {
   return (
     <Container>
       <Card />
