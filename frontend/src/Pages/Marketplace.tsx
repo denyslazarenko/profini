@@ -5,7 +5,7 @@ import { VectorBackground } from '../Components/VectorBackground';
 export const Marketplace: React.FC = () => {
   return (
     <Container>
-      <VectorBackground>Marketplace</VectorBackground>
+      <VectorBackground title={'Marketplace'}></VectorBackground>
     </Container>
   );
 };
