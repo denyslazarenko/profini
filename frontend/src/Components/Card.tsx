@@ -3,27 +3,27 @@ import { P } from './Text';
 import { Button } from './Button';
 import { NFT } from '../types';
 import { useMemo } from 'react';
+import { getOpenSeaUrl } from '../Utils/utils';
 
 export const Card: React.FC<{
   nft: NFT;
   hidden?: boolean;
   hideDetails?: boolean;
 }> = ({ nft, hidden, hideDetails }) => {
-  const price = useMemo(() => {
-    if (nft.price) return nft.price + ' ETH';
-    if (nft.soldFor) return 'Sold for ' + nft.soldFor + ' ETH';
-    return 'unlisted';
-  }, [nft]);
+  // const price = useMemo(() => {
+  //   if (nft.price) return nft.price + ' ETH';
+  //   if (nft.soldFor) return 'Sold for ' + nft.soldFor + ' ETH';
+  //   return 'unlisted';
+  // }, [nft]);
 
   return (
     <Container>
       {hidden && <Hidden />}
-      <Image src={nft.imageUrlOriginal} />
+      <Image src={nft.imageUrl} />
       {!hideDetails ? (
         <>
-          {' '}
-          <Price>{price}</Price>
-          <Button onClick={() => window.open(nft.openSeaUrl)}>
+          {/* <Price>{price}</Price> */}
+          <Button onClick={() => window.open(getOpenSeaUrl(nft.id))}>
             View on OpenSea
           </Button>
         </>

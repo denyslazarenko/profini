@@ -1,106 +1,23 @@
-import axios from 'axios';
-import { BigNumber } from 'ethers';
 import { useEffect, useState } from 'react';
-import { CONFIG } from '../config';
+import { MainStore } from '../Store/mainStore';
 import { NFT } from '../types';
 
-const OPENSEA_URL = `https://api.opensea.io/api/v1/assets?order_direction=desc&offset=0&limit=50&asset_contract_address=`;
-const TESTNET_OPENSEA_URL = `https://testnets-api.opensea.io/api/v1/assets?order_direction=desc&offset=0&limit=50&asset_contract_address=`;
+export const useNFTs = (): NFT[] => {
+  const [nfts, setNFTs] = useState<NFT[]>([]);
 
-export function useNFTs(): NFT[] {
-  const [fetches, setFetches] = useState(0);
-  const [nfts, setNfts] = useState<NFT[]>([]);
+  const maxId = 10;
 
   useEffect(() => {
     (async () => {
-      const newNfts: NFT[] = [];
-      const tokenAddress = CONFIG.TOKEN_ADDRESS;
-      // TODO: type
-      let assetsObjects: any;
-      try {
-        assetsObjects = await axios.get(OPENSEA_URL + tokenAddress);
-        assetsObjects = assetsObjects.data;
-      } catch (e) {
-        console.log('retrying', e);
-        setTimeout(() => {
-          setFetches(current => current + 1);
-        }, 1500);
-        setNfts([]);
+      const mainStore = MainStore.getInstance();
+
+      for (let i = 0; i < maxId; i++) {
+        const nft = await mainStore.getTokenData(i);
+        if (!nft) continue;
+        setNFTs(curr => [...curr, nft]);
       }
-      console.log('Asset objects', assetsObjects);
-      assetsObjects.assets.reverse().forEach(async (asset: any) => {
-        if (!asset.image_original_url) {
-          setNfts([]);
-        }
-        let price = 0;
-        let sold = false;
-        console.log('Assets', asset);
-        if (asset.sell_orders) {
-          if (asset.sell_orders[0]) {
-            //price = web3.utils.fromWei(`${new Bignumber(asset.sell_orders[0].base_price).toNumber()}`, 'ether');
-            console.log('Baseprice', asset.sell_orders[0].base_price);
-            price =
-              parseInt(
-                BigNumber.from(asset.sell_orders[0].base_price).toString()
-              ) / 1e18;
-          } else {
-            price = 0;
-            sold = true;
-          }
-        } else {
-          price = 0;
-          sold = true;
-        }
-        let owner;
-        let soldFor: number | undefined;
-        if (asset.owner.user) {
-          if (asset.owner.user.username) {
-            owner = asset.owner.user.username;
-          }
-        }
-        if (asset.last_sale) {
-          soldFor =
-            parseInt(BigNumber.from(asset.last_sale.total_price).toString()) /
-            1e18;
-        }
-        if (!owner) {
-          owner = asset.owner.address;
-        }
-        if (owner === 'BurnAddress') {
-          setNfts([]);
-        }
-
-        let creator;
-        if (asset.creator.user) {
-          if (asset.creator.user.username) {
-            creator = asset.creator.user.username;
-          }
-        }
-        if (!creator) {
-          creator = asset.creator.address;
-        }
-        const buyOrder = asset.sell_orders && asset.sell_orders[0];
-        console.log('buy order', buyOrder);
-
-        newNfts.push({
-          name: asset.name,
-          imageUrlOriginal: asset.image_original_url,
-          tokenId: asset.token_id,
-          description: asset.description,
-          owner,
-          creator,
-          price,
-          buyOrder,
-          sold,
-          soldFor,
-          openSeaUrl: asset.permalink,
-          raw: asset
-        });
-      });
-      console.log('new nfts', newNfts);
-      setNfts(newNfts);
     })();
-  }, [fetches]);
+  }, []);
 
   return nfts;
-}
+};
