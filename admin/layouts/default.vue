@@ -58,6 +58,11 @@ export default {
           title: 'Upload card',
           to: '/upload_image',
         },
+        {
+          icon: 'mdi-apps',
+          title: 'Generate vouchers',
+          to: '/generate-vouchers',
+        },
       ],
     }
   },
