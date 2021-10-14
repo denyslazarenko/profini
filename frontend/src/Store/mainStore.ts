@@ -3,7 +3,10 @@ import { ethers } from 'ethers';
 import { makeAutoObservable } from 'mobx';
 import { CONFIG } from '../config';
 import { NFT, AddEthereumChainParameter } from '../types';
-import { NFT_ABI } from './contractAbi';
+import { BOOSTER_ABI } from './boosterAbi';
+import { NFT_ABI } from './nftAbi';
+
+const DEV = true;
 
 export class MainStore {
   ethAddress: string | undefined;
@@ -11,6 +14,8 @@ export class MainStore {
   provider: any;
   nftContractWrite: ethers.Contract | undefined;
   nftContractRead: ethers.Contract | undefined;
+  boosterContractRead: ethers.Contract | undefined;
+  boosterContractWrite: ethers.Contract | undefined;
   static instance: MainStore;
 
   constructor() {
@@ -63,7 +68,7 @@ export class MainStore {
 
     this.setupContracts();
 
-    if (ethereum.networkVersion !== '0x89') {
+    if (ethereum.networkVersion !== (DEV ? '' : '0x89')) {
       setTimeout(() => this.switchToPolygonNetwork(), 500);
     }
 
@@ -71,11 +76,30 @@ export class MainStore {
   }
 
   async setupContracts() {
-    const address = CONFIG.TOKEN_ADDRESS;
-    const abi = NFT_ABI;
+    const nftAddress = CONFIG.TOKEN_ADDRESS;
+    const boosterAddress = CONFIG.BOOSTER_ADDRESS;
 
-    this.nftContractWrite = new ethers.Contract(address, abi, this.signer);
-    this.nftContractRead = new ethers.Contract(address, abi, this.provider);
+    this.nftContractWrite = new ethers.Contract(
+      nftAddress,
+      NFT_ABI,
+      this.signer
+    );
+    this.nftContractRead = new ethers.Contract(
+      nftAddress,
+      NFT_ABI,
+      this.provider
+    );
+
+    this.boosterContractWrite = new ethers.Contract(
+      boosterAddress,
+      BOOSTER_ABI,
+      this.signer
+    );
+    this.boosterContractRead = new ethers.Contract(
+      boosterAddress,
+      BOOSTER_ABI,
+      this.provider
+    );
   }
 
   async getTokenURI(id: number) {
@@ -115,26 +139,48 @@ export class MainStore {
       return;
     }
 
-    const params: [AddEthereumChainParameter] = [
-      {
-        chainId: '0x89',
-        chainName: 'Polygon',
-        rpcUrls: [
-          // 'https://rpc-mainnet.matic.network/',
-          'https://rpc-mainnet.maticvigil.com/',
-          'https://rpc-mainnet.matic.quiknode.pro'
-        ],
-        nativeCurrency: {
-          name: 'Matic Token',
-          symbol: 'MATIC',
-          decimals: 18
-        }
-      }
-    ];
+    const params: [AddEthereumChainParameter] = DEV
+      ? [
+          {
+            chainId: '0x13881',
+            chainName: 'Mumbai',
+            rpcUrls: [
+              // 'https://rpc-mainnet.matic.network/',
+              'https://rpc-mumbai.matic.today'
+            ],
+            nativeCurrency: {
+              name: 'Matic Token',
+              symbol: 'MATIC',
+              decimals: 18
+            }
+          }
+        ]
+      : [
+          {
+            chainId: '0x89',
+            chainName: 'Polygon',
+            rpcUrls: [
+              // 'https://rpc-mainnet.matic.network/',
+              'https://rpc-mainnet.maticvigil.com/',
+              'https://rpc-mainnet.matic.quiknode.pro'
+            ],
+            nativeCurrency: {
+              name: 'Matic Token',
+              symbol: 'MATIC',
+              decimals: 18
+            }
+          }
+        ];
 
     await ethereum.request({
       method: 'wallet_addEthereumChain',
       params
     });
+  }
+
+  async buyBooster() {
+    console.log('buying booster');
+    const result = await this.boosterContractWrite?.drawPack();
+    console.log('result', result);
   }
 }

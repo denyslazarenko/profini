@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import { Card } from '../Components/Card';
 import { FancyButton } from '../Components/FancyButton';
 import { P } from '../Components/Text';
+import { MainStore } from '../Store/mainStore';
 import { colors } from '../theme';
 import { NFT } from '../types';
 
@@ -40,8 +41,10 @@ const mockNFT: NFT = {
 export const Booster = () => {
   const [state, setState] = useState<BoosterState>(BoosterState.NOT_STARTED);
   const [revealed, setRevealed] = useState(0);
+  const mainStore = MainStore.getInstance();
 
-  const onBuyBooster = () => {
+  const onBuyBooster = async () => {
+    await mainStore.buyBooster();
     setState(BoosterState.HIDDEN);
   };
 
