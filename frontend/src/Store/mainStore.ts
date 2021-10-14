@@ -2,7 +2,7 @@ import axios from 'axios';
 import { ethers } from 'ethers';
 import { makeAutoObservable } from 'mobx';
 import { CONFIG } from '../config';
-import { NFT } from '../types';
+import { NFT, AddEthereumChainParameter } from '../types';
 import { NFT_ABI } from './contractAbi';
 
 export class MainStore {
@@ -15,6 +15,9 @@ export class MainStore {
 
   constructor() {
     makeAutoObservable(this);
+    const metaMaskAvailable = localStorage.getItem('metamaskAvailable');
+    console.log(metaMaskAvailable);
+    if (metaMaskAvailable) this.loginMetamask();
   }
 
   static getInstance() {
@@ -59,6 +62,12 @@ export class MainStore {
     });
 
     this.setupContracts();
+
+    if (ethereum.networkVersion !== '0x89') {
+      setTimeout(() => this.switchToPolygonNetwork(), 500);
+    }
+
+    localStorage.setItem('metamaskAvailable', 'true');
   }
 
   async setupContracts() {
@@ -97,5 +106,35 @@ export class MainStore {
       console.error(e);
       return undefined;
     }
+  }
+
+  async switchToPolygonNetwork() {
+    const ethereum = (window as any).ethereum;
+    if (!ethereum) {
+      console.error('MetaMask not installed');
+      return;
+    }
+
+    const params: [AddEthereumChainParameter] = [
+      {
+        chainId: '0x89',
+        chainName: 'Polygon',
+        rpcUrls: [
+          // 'https://rpc-mainnet.matic.network/',
+          'https://rpc-mainnet.maticvigil.com/',
+          'https://rpc-mainnet.matic.quiknode.pro'
+        ],
+        nativeCurrency: {
+          name: 'Matic Token',
+          symbol: 'MATIC',
+          decimals: 18
+        }
+      }
+    ];
+
+    await ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params
+    });
   }
 }
