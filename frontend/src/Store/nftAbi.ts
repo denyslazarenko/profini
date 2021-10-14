@@ -314,6 +314,34 @@ export const NFT_ABI = [
     type: 'function'
   },
   {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address'
+      },
+      {
+        internalType: 'uint256[]',
+        name: 'amounts',
+        type: 'uint256[]'
+      },
+      {
+        internalType: 'string[]',
+        name: 'tokenURIs',
+        type: 'string[]'
+      },
+      {
+        internalType: 'bytes',
+        name: 'data',
+        type: 'bytes'
+      }
+    ],
+    name: 'mintBatch',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
     inputs: [],
     name: 'owner',
     outputs: [
@@ -475,6 +503,19 @@ export const NFT_ABI = [
     type: 'function'
   },
   {
+    inputs: [],
+    name: 'tokenIds',
+    outputs: [
+      {
+        internalType: 'uint256[]',
+        name: '',
+        type: 'uint256[]'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
     inputs: [
       {
         internalType: 'address',
@@ -508,6 +549,19 @@ export const NFT_ABI = [
         internalType: 'string',
         name: '',
         type: 'string'
+      }
+    ],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [],
+    name: 'uris',
+    outputs: [
+      {
+        internalType: 'string[]',
+        name: '',
+        type: 'string[]'
       }
     ],
     stateMutability: 'view',

@@ -33,32 +33,30 @@ app.get('/:addr', (req: Request, res: Response) => {
     sendPromise
     .then((tx) => {
         console.log(tx);
+        res.sendStatus(200);
     })
     .catch(err => console.log(err));
-
-    res.sendStatus(200);
 });
 
-app.get('/tokenIDs', (req: Request, res: Response) => {
+app.get('/contract/tokenIDs', (req: Request, res: Response) => {
     let tokenPromise = contract.tokenIDs();
     tokenPromise
     .then((value: any) => {
         console.log(value);
+        res.send(value);
     })
     .catch((err: any) => console.log(err));
 
-    res.sendStatus(200);
 });
 
-app.get('/uris', (req: Request, res: Response) => {
+app.get('/contract/uris', (req: Request, res: Response) => {
     let urisPromise = contract.uris();
     urisPromise
     .then((value: any) => {
         console.log(value);
+        res.send(value);
     })
     .catch((err: any) => console.log(err));
-
-    res.sendStatus(200);
 });
 
 app.listen(PORT, () => console.log(`Running on ${PORT} ⚡`));
