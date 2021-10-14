@@ -4,7 +4,9 @@ import styled from 'styled-components';
 import { Card } from '../Components/Card';
 import { FancyButton } from '../Components/FancyButton';
 import { P } from '../Components/Text';
+import { MainStore } from '../Store/mainStore';
 import { colors } from '../theme';
+import { NFT } from '../types';
 
 enum BoosterState {
   NOT_STARTED,
@@ -13,7 +15,7 @@ enum BoosterState {
   REVEALED
 }
 
-const mockNFT = {
+const mockNFTOpenSea = {
   buyOrder: null,
   creator: '0xdd5fb125f9ef8934fa4b318512be8f9bb1d151fc',
   description: 's',
@@ -30,11 +32,19 @@ const mockNFT = {
   tokenId: '1'
 };
 
+const mockNFT: NFT = {
+  imageUrl:
+    'https://ipfs.io/ipfs/QmTU3oqtETjHUuzNyM5B2vvZSNms1T418dae8Dd3X3bShB',
+  id: 1
+};
+
 export const Booster = () => {
   const [state, setState] = useState<BoosterState>(BoosterState.NOT_STARTED);
   const [revealed, setRevealed] = useState(0);
+  const mainStore = MainStore.getInstance();
 
-  const onBuyBooster = () => {
+  const onBuyBooster = async () => {
+    await mainStore.buyBooster();
     setState(BoosterState.HIDDEN);
   };
 

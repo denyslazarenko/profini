@@ -1,9 +1,9 @@
 import { CardGrid } from '../Components/CardGrid';
 import { VectorBackground } from '../Components/VectorBackground';
 
-export const Wallet: React.FC = () => {
+export const Collection: React.FC = () => {
   return (
-    <VectorBackground title={'Wallet'}>
+    <VectorBackground title={'Collection'}>
       <CardGrid nfts={[]} />
     </VectorBackground>
   );

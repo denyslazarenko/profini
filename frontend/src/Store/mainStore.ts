@@ -1,9 +1,12 @@
 import axios from 'axios';
 import { ethers } from 'ethers';
 import { makeAutoObservable } from 'mobx';
-import { NFTStorage } from 'nft.storage';
 import { CONFIG } from '../config';
-import { NFT_ABI } from './contractAbi';
+import { NFT, AddEthereumChainParameter } from '../types';
+import { BOOSTER_ABI } from './boosterAbi';
+import { NFT_ABI } from './nftAbi';
+
+const DEV = true;
 
 export class MainStore {
   ethAddress: string | undefined;
@@ -11,10 +14,15 @@ export class MainStore {
   provider: any;
   nftContractWrite: ethers.Contract | undefined;
   nftContractRead: ethers.Contract | undefined;
+  boosterContractRead: ethers.Contract | undefined;
+  boosterContractWrite: ethers.Contract | undefined;
   static instance: MainStore;
 
   constructor() {
     makeAutoObservable(this);
+    const metaMaskAvailable = localStorage.getItem('metamaskAvailable');
+    console.log(metaMaskAvailable);
+    if (metaMaskAvailable) this.loginMetamask();
   }
 
   static getInstance() {
@@ -59,14 +67,39 @@ export class MainStore {
     });
 
     this.setupContracts();
+
+    if (ethereum.networkVersion !== (DEV ? '' : '0x89')) {
+      setTimeout(() => this.switchToPolygonNetwork(), 500);
+    }
+
+    localStorage.setItem('metamaskAvailable', 'true');
   }
 
   async setupContracts() {
-    const address = CONFIG.TOKEN_ADDRESS;
-    const abi = NFT_ABI;
+    const nftAddress = CONFIG.TOKEN_ADDRESS;
+    const boosterAddress = CONFIG.BOOSTER_ADDRESS;
 
-    this.nftContractWrite = new ethers.Contract(address, abi, this.signer);
-    this.nftContractRead = new ethers.Contract(address, abi, this.provider);
+    this.nftContractWrite = new ethers.Contract(
+      nftAddress,
+      NFT_ABI,
+      this.signer
+    );
+    this.nftContractRead = new ethers.Contract(
+      nftAddress,
+      NFT_ABI,
+      this.provider
+    );
+
+    this.boosterContractWrite = new ethers.Contract(
+      boosterAddress,
+      BOOSTER_ABI,
+      this.signer
+    );
+    this.boosterContractRead = new ethers.Contract(
+      boosterAddress,
+      BOOSTER_ABI,
+      this.provider
+    );
   }
 
   async getTokenURI(id: number) {
@@ -75,20 +108,79 @@ export class MainStore {
     return uri;
   }
 
-  async toGatewayUrl(uri: string) {
+  toGatewayUrl(ipfsUri: string) {
     const gateway = 'https://dweb.link/';
-    const url = new URL(String(uri));
+    const url = new URL(String(ipfsUri));
     return url.protocol === 'ipfs:'
       ? new URL(`/ipfs/${url.href.slice('ipfs://'.length)}`, gateway)
       : url;
   }
 
-  async getTokenData(id: number) {
-    if (!this.signer) return;
-    const uri = await this.getTokenURI(id);
-    console.log('uri');
-    const url = await this.toGatewayUrl(uri);
-    const data = await axios.get(url.href);
-    console.log(data);
+  async getTokenData(id: number, ipfsUri?: string): Promise<NFT | undefined> {
+    try {
+      if (!this.signer) return undefined;
+      const tokenUri = ipfsUri || (await this.getTokenURI(id));
+      console.log('uri', tokenUri);
+      const url = await this.toGatewayUrl(tokenUri);
+      const data: any = await axios.get(url.href);
+      console.log(data);
+      const imageUrl = this.toGatewayUrl(data?.data.image).href;
+      return { imageUrl, id };
+    } catch (e) {
+      console.error(e);
+      return undefined;
+    }
+  }
+
+  async switchToPolygonNetwork() {
+    const ethereum = (window as any).ethereum;
+    if (!ethereum) {
+      console.error('MetaMask not installed');
+      return;
+    }
+
+    const params: [AddEthereumChainParameter] = DEV
+      ? [
+          {
+            chainId: '0x13881',
+            chainName: 'Mumbai',
+            rpcUrls: [
+              // 'https://rpc-mainnet.matic.network/',
+              'https://rpc-mumbai.matic.today'
+            ],
+            nativeCurrency: {
+              name: 'Matic Token',
+              symbol: 'MATIC',
+              decimals: 18
+            }
+          }
+        ]
+      : [
+          {
+            chainId: '0x89',
+            chainName: 'Polygon',
+            rpcUrls: [
+              // 'https://rpc-mainnet.matic.network/',
+              'https://rpc-mainnet.maticvigil.com/',
+              'https://rpc-mainnet.matic.quiknode.pro'
+            ],
+            nativeCurrency: {
+              name: 'Matic Token',
+              symbol: 'MATIC',
+              decimals: 18
+            }
+          }
+        ];
+
+    await ethereum.request({
+      method: 'wallet_addEthereumChain',
+      params
+    });
+  }
+
+  async buyBooster() {
+    console.log('buying booster');
+    const result = await this.boosterContractWrite?.drawPack();
+    console.log('result', result);
   }
 }

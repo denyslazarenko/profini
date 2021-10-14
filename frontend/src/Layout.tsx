@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Navbar } from './Components/Navbar';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { Wallet } from './Pages/Wallet';
+import { Collection } from './Pages/Collection';
 import { Marketplace } from './Pages/Marketplace';
 import { Booster } from './Pages/Booster';
 
@@ -12,8 +12,8 @@ export const Layout: React.FC = () => {
       <Router>
         <Navbar />
         <Switch>
-          <Route path="/wallet">
-            <Wallet />
+          <Route path="/collection">
+            <Collection />
           </Route>
           <Route path="/booster">
             <Booster />
