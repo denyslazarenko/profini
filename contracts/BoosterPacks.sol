@@ -46,12 +46,12 @@ contract BoosterPacks is Ownable, ERC1155Holder {
         drawPack();
     }
 
-    event DrawPack(uint256[]);
+    event DrawPack(address, uint256[]);
 
     function drawPack() private {
         Profini profini = Profini(contractAddress);
 
-        uint256[] memory tokenIds = profini.tokenIds();
+        uint256[] memory tokenIds = profini.tokenIDs();
 
         address[] memory accounts = new address[](tokenIds.length);
         for (uint256 i = 0; i < tokenIds.length; i++) {
@@ -100,6 +100,6 @@ contract BoosterPacks is Ownable, ERC1155Holder {
             }
         }
 
-        emit DrawPack(drawnCards);
+        emit DrawPack(msg.sender, drawnCards);
     }
 }
