@@ -38,8 +38,8 @@ app.get('/:addr', (req: Request, res: Response) => {
     .catch(err => console.log(err));
 });
 
-app.get('/contract/tokenIds', (req: Request, res: Response) => {
-    let tokenPromise = contract.tokenIds();
+app.get('/contract/tokenIDs', (req: Request, res: Response) => {
+    let tokenPromise = contract.tokenIDs();
     tokenPromise
     .then((value: any) => {
         console.log(value);

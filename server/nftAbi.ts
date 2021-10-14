@@ -504,7 +504,7 @@ export const NFT_ABI = [
   },
   {
     "inputs": [],
-    "name": "tokenIds",
+    "name": "tokenIDs",
     "outputs": [
       {
         "internalType": "uint256[]",
