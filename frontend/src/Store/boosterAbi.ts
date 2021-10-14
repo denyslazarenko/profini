@@ -14,6 +14,25 @@ export const BOOSTER_ABI = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: 'address',
+        name: '',
+        type: 'address'
+      },
+      {
+        indexed: false,
+        internalType: 'uint256[]',
+        name: '',
+        type: 'uint256[]'
+      }
+    ],
+    name: 'DrawPack',
+    type: 'event'
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: 'address',
         name: 'previousOwner',
@@ -31,15 +50,22 @@ export const BOOSTER_ABI = [
   },
   {
     inputs: [],
-    name: 'drawPack',
-    outputs: [
+    name: 'buyPack',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function'
+  },
+  {
+    inputs: [
       {
-        internalType: 'uint256[]',
-        name: '',
-        type: 'uint256[]'
+        internalType: 'string',
+        name: 'voucher',
+        type: 'string'
       }
     ],
-    stateMutability: 'payable',
+    name: 'claimPack',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function'
   },
   {
@@ -136,6 +162,19 @@ export const BOOSTER_ABI = [
   {
     inputs: [],
     name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [
+      {
+        internalType: 'string',
+        name: 'voucher',
+        type: 'string'
+      }
+    ],
+    name: 'setVoucher',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function'
