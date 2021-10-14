@@ -10,7 +10,9 @@ export const Card: React.FC<{
   nft: NFT;
   hidden?: boolean;
   hideDetails?: boolean;
-}> = ({ nft, hidden, hideDetails }) => {
+  grayed?: boolean;
+  num?: number;
+}> = ({ nft, hidden, hideDetails, grayed, num }) => {
   const mainStore = MainStore.getInstance();
   // const price = useMemo(() => {
   //   if (nft.price) return nft.price + ' ETH';
@@ -19,7 +21,8 @@ export const Card: React.FC<{
   // }, [nft]);
 
   return (
-    <Container>
+    <Container grayed={!num || num === 0}>
+      {num && <Number>{num}</Number>}
       {hidden && <Hidden />}
       <Image src={nft.imageUrl} />
       {!hideDetails ? (
@@ -37,18 +40,19 @@ export const Card: React.FC<{
   );
 };
 
-const Container = styled.div`
+const Container = styled.div<{ grayed: boolean }>`
   paddding: 10px;
   width: 100%;
   position: relative;
+  ${p => (p.grayed ? 'filter: grayscale(100%);' : '')}
 `;
 
 const Image = styled.img`
   width: 100%;
   border-radius: 16px;
-  box-shadow: 5px 5px 10px 6px rgba(0,0,0,0.25);
-  transition: ease-in-out .2s;
+  transition: ease-in-out 0.2s;
   :hover {
+    box-shadow: 5px 5px 10px 6px rgba(0, 0, 0, 0.25);
     transform: translateY(-10px) scale(1.02);
   }
 `;
@@ -74,4 +78,20 @@ const ButtonContainer = styled.div`
   display: grid;
   margin-top: 10px;
   grid-gap: 8px;
+`;
+
+const Number = styled.div`
+  position: absolute;
+  background-color: #000;
+  width: 40px;
+  height: 40px;
+  border-radius: 20px;
+  left: -10px;
+  top: -10px;
+  opacity: 0.4;
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  color: #fff;
+  font-weight: bold;
 `;

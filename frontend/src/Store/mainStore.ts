@@ -284,4 +284,26 @@ export class MainStore extends EventEmitter {
     console.log('open transfer modal');
     this.transferModalOpen = id;
   }
+
+  async getOwnTokens(): Promise<{ [id: string]: number }> {
+    if (!this.nftContractRead) {
+      throw new Error('NFT contract not set up');
+    }
+
+    const nfts: { [id: string]: number } = {};
+
+    const allTokenIds = await this.getTokenIds();
+    const accounts = allTokenIds.map((_: any) => this.ethAddress);
+
+    const result = await this.nftContractRead.balanceOfBatch(
+      accounts,
+      allTokenIds
+    );
+
+    for (let i = 0; i < result.length; i++) {
+      nfts[allTokenIds[i]] = BigNumber.from(result[i]).toNumber();
+    }
+
+    return nfts;
+  }
 }
