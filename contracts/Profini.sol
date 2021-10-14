@@ -47,7 +47,7 @@ contract Profini is ERC1155, Ownable, Pausable, ERC1155Burnable {
 
     function uris() public view returns (string[] memory) {
         uint256 lastTokenId = _tokenCounter.current();
-        string[] memory uriList = new string[](lastTokenId - 1);
+        string[] memory uriList = new string[](lastTokenId);
 
         for (uint256 i = 1; i <= lastTokenId; i++) {
             uriList[i - 1] = _uris[i];

@@ -16,7 +16,7 @@ const provider: JsonRpcProvider = new JsonRpcProvider(
     "https://polygon-mumbai.infura.io/v3/b9bdb6b417c14d7d853913f3a1559e22");
 
 const wallet: Wallet = new Wallet(PRIVATE_KEY, provider);
-const contractWrite = new ethers.Contract(CONTRACT_ADDRESS, NFT_ABI, wallet);
+const contract = new ethers.Contract(CONTRACT_ADDRESS, NFT_ABI, provider);
 
 app.use(helmet());
 app.use(express.json());
@@ -24,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/:addr', (req: Request, res: Response) => {
     const receiveAddr = req.params.addr;
+    console.log(utils.getAddress(receiveAddr));
     let tx = {
         to: receiveAddr,
         value: utils.parseEther('0.0001')
@@ -33,18 +34,30 @@ app.get('/:addr', (req: Request, res: Response) => {
     sendPromise
     .then((tx) => {
         console.log(tx);
+        res.sendStatus(200);
     })
-    .catch(err => alert(err));
-
-    res.sendStatus(200);
+    .catch(err => console.log(err));
 });
 
-app.get('/:tokenIDs', (req: Request, res: Response) => {
-    return contractWrite.tokenIds();
+app.get('/contract/tokenIDs', (req: Request, res: Response) => {
+    let tokenPromise = contract.tokenIDs();
+    tokenPromise
+    .then((value: any) => {
+        console.log(value);
+        res.send(value);
+    })
+    .catch((err: any) => console.log(err));
+
 });
 
-app.get('/:uris', (req: Request, res: Response) => {
-    return contractWrite.uris();
+app.get('/contract/uris', (req: Request, res: Response) => {
+    let urisPromise = contract.uris();
+    urisPromise
+    .then((value: any) => {
+        console.log(value);
+        res.send(value);
+    })
+    .catch((err: any) => console.log(err));
 });
 
 app.listen(PORT, () => console.log(`Running on ${PORT} ⚡`));
