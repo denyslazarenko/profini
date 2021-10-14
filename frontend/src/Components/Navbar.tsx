@@ -36,11 +36,24 @@ const Bar = styled.div`
   background-color: #000;
   display: grid;
   grid-auto-flow: row;
-  grid-template-columns: 1fr auto auto auto auto;
+  grid-template-columns: 1fr auto auto auto auto auto;
   grid-gap: 20px;
   padding: 10px;
   align-items: center;
   border-bottom: 1px solid #ffffff;
+`;
+
+const MenuButton = styled.p`
+  font-weight: bold;
+  color: #fff;
+  text-decoration: none;
+  text-transform: lowercase;
+  transition: color 200ms ease;
+  cursor: pointer;
+
+  :hover {
+    color: ${colors.lightAccent};
+  }
 `;
 
 const MenuItem = styled(Link)`
