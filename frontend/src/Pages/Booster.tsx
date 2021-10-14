@@ -41,10 +41,18 @@ const mockNFT: NFT = {
 export const Booster = () => {
   const [state, setState] = useState<BoosterState>(BoosterState.NOT_STARTED);
   const [revealed, setRevealed] = useState(0);
+  const [tokens, setTokens] = useState<NFT[]>([]);
   const mainStore = MainStore.getInstance();
 
   useEffect(() => {
-    mainStore.on('DrawPack', tokenIds => {
+    mainStore.on('DrawPack', async (tokenIds: string[]) => {
+      const tempTokens: NFT[] = (
+        await Promise.all(
+          tokenIds.map(id => mainStore.getTokenData(parseInt(id)))
+        )
+      ).filter(token => Boolean(token)) as any;
+
+      setTokens(tempTokens);
       setState(BoosterState.HIDDEN);
     });
   }, []);
@@ -75,9 +83,9 @@ export const Booster = () => {
       ) : state === BoosterState.HIDDEN ? (
         <Inner>
           <CardGrid>
-            <Card nft={mockNFT} hidden hideDetails />
-            <Card nft={mockNFT} hidden hideDetails />
-            <Card nft={mockNFT} hidden hideDetails />
+            {tokens.map(token => (
+              <Card nft={token} hidden hideDetails />
+            ))}
           </CardGrid>
 
           <FancyButton onClick={onReveal}>Reveal</FancyButton>
@@ -85,9 +93,9 @@ export const Booster = () => {
       ) : state === BoosterState.REVEALED ? (
         <Inner>
           <CardGrid>
-            <Card nft={mockNFT} />
-            <Card nft={mockNFT} />
-            <Card nft={mockNFT} />
+            {tokens.map(token => (
+              <Card nft={token} hideDetails />
+            ))}
           </CardGrid>
 
           <Nav to="/wallet">
