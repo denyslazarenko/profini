@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { ethers } from 'ethers';
 import { makeAutoObservable } from 'mobx';
 import { NFTStorage } from 'nft.storage';
@@ -83,6 +84,11 @@ export class MainStore {
   }
 
   async getTokenData(id: number) {
+    if (!this.signer) return;
     const uri = await this.getTokenURI(id);
+    console.log('uri');
+    const url = await this.toGatewayUrl(uri);
+    const data = await axios.get(url.href);
+    console.log(data);
   }
 }

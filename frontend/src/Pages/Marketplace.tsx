@@ -8,7 +8,7 @@ import { MainStore } from '../Store/mainStore';
 export const Marketplace: React.FC = () => {
   // const nfts = useNFTs();
   const mainStore = MainStore.getInstance();
-  const uri = mainStore.getTokenURI(1);
+  const uri = mainStore.getTokenData(1);
 
   return (
     <Container>
