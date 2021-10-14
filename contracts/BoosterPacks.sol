@@ -33,6 +33,10 @@ contract BoosterPacks is Ownable, ERC1155Holder {
         return (rndInt % max) + 1;
     }
 
+    function withdraw() external payable onlyOwner {
+        payable(msg.sender).transfer(address(this).balance);
+    }
+
     function buyPack() public payable {
         require(msg.value >= PRICE_PER_BOOSTER, "Not enough Matic sent.");
         drawPack();
