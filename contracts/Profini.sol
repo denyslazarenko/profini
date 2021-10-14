@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.2;
 
-import "@openzeppelin/contracts/token/ERC1155/ERC1155.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/security/Pausable.sol";
-import "@openzeppelin/contracts/token/ERC1155/extensions/ERC1155Burnable.sol";
-import "@openzeppelin/contracts/utils/Counters.sol";
+import "./ERC1155.sol";
+import "./Ownable.sol";
+import "./Pausable.sol";
+import "./ERC1155Burnable.sol";
+import "./Counters.sol";
 
 contract Profini is ERC1155, Ownable, Pausable, ERC1155Burnable {
     using Counters for Counters.Counter;

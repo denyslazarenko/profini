@@ -2,8 +2,8 @@
 pragma solidity ^0.8.2;
 
 import "./Profini.sol";
-import "@openzeppelin/contracts/access/Ownable.sol";
-import "@openzeppelin/contracts/token/ERC1155/utils/ERC1155Holder.sol";
+import "./Ownable.sol";
+import "./ERC1155Holder.sol";
 
 contract BoosterPacks is Ownable, ERC1155Holder {
     uint256 constant PRICE_PER_BOOSTER = 0.00001 ether;
