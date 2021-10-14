@@ -40,6 +40,12 @@ const Container = styled.div`
 
 const Image = styled.img`
   width: 100%;
+  border-radius: 16px;
+  box-shadow: 5px 5px 10px 6px rgba(0,0,0,0.25);
+  transition: ease-in-out .2s;
+  :hover {
+    transform: translateY(-10px) scale(1.02);
+  }
 `;
 
 const Price = styled(P)`
