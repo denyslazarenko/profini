@@ -1,23 +1,29 @@
+import { autorun } from 'mobx';
 import { useEffect, useState } from 'react';
 import { MainStore } from '../Store/mainStore';
-import { NFT } from '../types';
+import { NFTS } from '../types';
 
-export const useNFTs = (): NFT[] => {
-  const [nfts, setNFTs] = useState<NFT[]>([]);
+export const useNFTs = (): NFTS => {
+  const [nfts, setNFTs] = useState<NFTS>({});
+  const mainStore = MainStore.getInstance();
 
-  const maxId = 10;
-
-  useEffect(() => {
-    (async () => {
-      const mainStore = MainStore.getInstance();
-
-      for (let i = 0; i < maxId; i++) {
-        const nft = await mainStore.getTokenData(i);
-        if (!nft) continue;
-        setNFTs(curr => [...curr, nft]);
-      }
-    })();
-  }, []);
+  useEffect(
+    () =>
+      autorun(() => {
+        (async () => {
+          console.log('Contracts ready', mainStore.contractsReady);
+          if (!mainStore.contractsReady) return;
+          const ids = (await mainStore.getTokenIds()) || [];
+          for (const id of ids) {
+            const nft = await mainStore.getTokenData(id);
+            console.log('NFT Data', nft);
+            if (!nft) continue;
+            setNFTs(curr => ({ ...curr, [id]: nft }));
+          }
+        })();
+      }),
+    []
+  );
 
   return nfts;
 };

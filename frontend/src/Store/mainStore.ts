@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { ethers } from 'ethers';
+import { ethers, utils } from 'ethers';
 import { makeAutoObservable } from 'mobx';
 import { CONFIG } from '../config';
 import { NFT, AddEthereumChainParameter } from '../types';
@@ -16,6 +16,8 @@ export class MainStore {
   nftContractRead: ethers.Contract | undefined;
   boosterContractRead: ethers.Contract | undefined;
   boosterContractWrite: ethers.Contract | undefined;
+  transferModalOpen?: string;
+  contractsReady: boolean = false;
   static instance: MainStore;
 
   constructor() {
@@ -30,6 +32,37 @@ export class MainStore {
       this.instance = new MainStore();
     }
     return this.instance;
+  }
+
+  setupEventListeners() {
+    const boosterFilter = {
+      address: CONFIG.BOOSTER_ADDRESS,
+      topics: [
+        // the name of the event, parnetheses containing the data type of each event, no spaces
+        utils.id('DrawPack(address,uint256[])')
+      ]
+    };
+
+    this.provider.on(boosterFilter, (data: any) => {
+      console.log('RECEIVED BOOSTER EVENT DATA', data);
+      // do whatever you want here
+      // I'm pretty sure this returns a promise, so don't forget to resolve it
+    });
+
+    const nftFilter = {
+      address: CONFIG.TOKEN_ADDRESS,
+      topics: [
+        // the name of the event, parnetheses containing the data type of each event, no spaces
+        // TransferSingle(address operator, address from, address to, uint256 id, uint256 value)
+        utils.id('TransferSingle(address,address,address,uint256,uint256)')
+      ]
+    };
+
+    this.provider.on(nftFilter, (data: any) => {
+      console.log('RECEIVED NFT EVENT DATA', data);
+      // do whatever you want here
+      // I'm pretty sure this returns a promise, so don't forget to resolve it
+    });
   }
 
   async loginMetamask() {
@@ -100,6 +133,14 @@ export class MainStore {
       BOOSTER_ABI,
       this.provider
     );
+
+    this.contractsReady = true;
+  }
+
+  async getTokenIds() {
+    const ids = await this.nftContractRead?.tokenIds();
+    console.log('ids', ids, this.nftContractRead);
+    return ids;
   }
 
   async getTokenURI(id: number) {
@@ -180,7 +221,16 @@ export class MainStore {
 
   async buyBooster() {
     console.log('buying booster');
-    const result = await this.boosterContractWrite?.drawPack();
+    if (!this.boosterContractWrite)
+      throw new Error('Booster contract not ready');
+
+    const transaction = await this.boosterContractWrite.drawPack();
+    const result = await transaction.wait();
     console.log('result', result);
+  }
+
+  async openTransferModal(id: string) {
+    console.log('open transfer modal');
+    this.transferModalOpen = id;
   }
 }
