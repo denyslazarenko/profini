@@ -5,6 +5,7 @@ import { Card } from '../Components/Card';
 import { FancyButton } from '../Components/FancyButton';
 import { P } from '../Components/Text';
 import { colors } from '../theme';
+import { NFT } from '../types';
 
 enum BoosterState {
   NOT_STARTED,
@@ -13,7 +14,7 @@ enum BoosterState {
   REVEALED
 }
 
-const mockNFT = {
+const mockNFTOpenSea = {
   buyOrder: null,
   creator: '0xdd5fb125f9ef8934fa4b318512be8f9bb1d151fc',
   description: 's',
@@ -28,6 +29,12 @@ const mockNFT = {
   sold: true,
   soldFor: undefined,
   tokenId: '1'
+};
+
+const mockNFT: NFT = {
+  imageUrl:
+    'https://ipfs.io/ipfs/QmTU3oqtETjHUuzNyM5B2vvZSNms1T418dae8Dd3X3bShB',
+  id: 1
 };
 
 export const Booster = () => {

@@ -1,4 +1,4 @@
-export interface NFT {
+export interface OPENSEA_NFT {
   name: string;
   imageUrlOriginal: string;
   tokenId: string;
@@ -11,4 +11,9 @@ export interface NFT {
   soldFor: number | undefined;
   openSeaUrl: string;
   raw: any;
+}
+
+export interface NFT {
+  imageUrl?: string;
+  id: number;
 }
