@@ -37,6 +37,25 @@ contract Profini is ERC1155, Ownable, Pausable, ERC1155Burnable {
         _unpause();
     }
 
+    function tokenIds() public view returns (uint256[] memory) {
+        uint256[] memory ids = new uint256[](_tokenCounter.current());
+        for (uint256 i = 0; i < _tokenCounter.current(); i++) {
+            ids[i] = i + 1;
+        }
+        return ids;
+    }
+
+    function uris() public view returns (string[] memory) {
+        uint256 lastTokenId = _tokenCounter.current();
+        string[] memory uriList = new string[](lastTokenId - 1);
+
+        for (uint256 i = 1; i <= lastTokenId; i++) {
+            uriList[i - 1] = _uris[i];
+        }
+
+        return uriList;
+    }
+
     function mint(
         address account,
         uint256 amount,
@@ -50,22 +69,16 @@ contract Profini is ERC1155, Ownable, Pausable, ERC1155Burnable {
         setURI(newTokenId, tokenURI);
     }
 
-    function tokenIds() public view returns (uint256[] memory) {
-        uint256[] memory ids = new uint256[](_tokenCounter.current());
-        for (uint256 i = 0; i < _tokenCounter.current(); i++) {
-            ids[i] = i + 1;
+    function mintBatch(
+        address account,
+        uint256[] memory amounts,
+        string[] memory tokenURIs,
+        bytes memory data
+    ) public onlyOwner {
+        for (uint256 i = 0; i < amounts.length; i++) {
+            mint(account, amounts[i], tokenURIs[i], data);
         }
-        return ids;
     }
-
-    // function mintBatch(
-    //     address to,
-    //     uint256[] memory ids,
-    //     uint256[] memory amounts,
-    //     bytes memory data
-    // ) public onlyOwner {
-    //     _mintBatch(to, ids, amounts, data);
-    // }
 
     function _beforeTokenTransfer(
         address operator,
