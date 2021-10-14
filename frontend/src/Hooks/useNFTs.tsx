@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import { CONFIG } from '../config';
 import { NFT } from '../types';
 
+const OPENSEA_URL = `https://api.opensea.io/api/v1/assets?order_direction=desc&offset=0&limit=50&asset_contract_address=`;
+const TESTNET_OPENSEA_URL = `https://testnets-api.opensea.io/api/v1/assets?order_direction=desc&offset=0&limit=50&asset_contract_address=`;
+
 export function useNFTs(): NFT[] {
   const [fetches, setFetches] = useState(0);
   const [nfts, setNfts] = useState<NFT[]>([]);
@@ -15,9 +18,7 @@ export function useNFTs(): NFT[] {
       // TODO: type
       let assetsObjects: any;
       try {
-        assetsObjects = await axios.get(
-          `https://api.opensea.io/api/v1/assets?order_direction=desc&offset=0&limit=50&asset_contract_address=${tokenAddress}`
-        );
+        assetsObjects = await axios.get(OPENSEA_URL + tokenAddress);
         assetsObjects = assetsObjects.data;
       } catch (e) {
         console.log('retrying', e);

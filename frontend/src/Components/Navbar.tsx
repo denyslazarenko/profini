@@ -14,6 +14,7 @@ export const Navbar: React.FC = observer(() => {
       <Logo to="/">profini</Logo>
       <MenuItem to="/">Marketplace</MenuItem>
       <MenuItem to="/wallet">Wallet</MenuItem>
+      <MenuItem to="/booster">Booster</MenuItem>
       <MetaMaskButton
         className="meta-mask-button"
         onClick={
@@ -35,10 +36,11 @@ const Bar = styled.div`
   background-color: #000;
   display: grid;
   grid-auto-flow: row;
-  grid-template-columns: 1fr auto auto auto;
+  grid-template-columns: 1fr auto auto auto auto;
   grid-gap: 20px;
   padding: 10px;
   align-items: center;
+  border-bottom: 1px solid #ffffff;
 `;
 
 const MenuItem = styled(Link)`

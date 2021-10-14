@@ -28,3 +28,9 @@ code {
   color: #af51fa !important;
   background-color: transparent !important;
 }
+
+@keyframes slidebg {
+  to {
+    background-position: 20vw;
+  }
+}
