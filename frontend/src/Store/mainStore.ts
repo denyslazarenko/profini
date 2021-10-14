@@ -1,7 +1,6 @@
 import axios from 'axios';
 import { ethers } from 'ethers';
 import { makeAutoObservable } from 'mobx';
-import { NFTStorage } from 'nft.storage';
 import { CONFIG } from '../config';
 import { NFT } from '../types';
 import { NFT_ABI } from './contractAbi';

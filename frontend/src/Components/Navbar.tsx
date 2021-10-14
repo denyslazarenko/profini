@@ -13,7 +13,7 @@ export const Navbar: React.FC = observer(() => {
     <Bar>
       <Logo to="/">profini</Logo>
       <MenuItem to="/">Marketplace</MenuItem>
-      <MenuItem to="/wallet">Wallet</MenuItem>
+      <MenuItem to="/collection">Collection</MenuItem>
       <MenuItem to="/booster">Booster</MenuItem>
       <MetaMaskButton
         className="meta-mask-button"
