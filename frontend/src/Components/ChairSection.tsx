@@ -21,6 +21,14 @@ export const ChairSection: React.FC<{
         <EmptyCard name="bro" />
         <EmptyCard name="bro2" />
       </CardList>
+      <div>
+        <Title>Researchers</Title>
+        <CounterText>1 of 20</CounterText>
+      </div>
+      <CardList>
+        <EmptyCard name="bro" />
+        <EmptyCard name="bro2" />
+      </CardList>
     </Container>
   );
 };
@@ -44,4 +52,5 @@ const CardList = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-gap: 20px;
+  margin: 25px 0px 50px 0px;
 `;

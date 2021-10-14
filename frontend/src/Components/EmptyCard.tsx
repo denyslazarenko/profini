@@ -12,7 +12,6 @@ export const EmptyCard: React.FC<{name: string}> = ({ name }) => {
 
 const Container = styled.div`
   background-color: #c4c4c4;
-  margin: 50px 0px;
   width: 100%;
   height: 250px;
   border-radius: 16px;
