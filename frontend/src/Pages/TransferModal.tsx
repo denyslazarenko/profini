@@ -1,23 +1,45 @@
 import { TextInput } from 'grommet';
+import { autorun } from 'mobx';
+import { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Button } from '../Components/Button';
 import { Card } from '../Components/Card';
+import { MainStore } from '../Store/mainStore';
 import { NFT } from '../types';
 
-const mockNFT: NFT = {
-  imageUrl:
-    'https://ipfs.io/ipfs/QmTU3oqtETjHUuzNyM5B2vvZSNms1T418dae8Dd3X3bShB',
-  id: 1
-};
-
 export const TransferModal = () => {
-  console.log('render modal');
+  const [nft, setNft] = useState<NFT | undefined>(undefined);
+  const [address, setAddress] = useState('');
+  const mainStore = MainStore.getInstance();
+  useEffect(
+    () =>
+      autorun(async () => {
+        const mainStore = MainStore.getInstance();
+        if (!mainStore.transferModalOpen) return;
+        const nft = await mainStore.getTokenData(
+          parseInt(mainStore.transferModalOpen)
+        );
+        nft && setNft(nft);
+      }),
+    []
+  );
+
   return (
     <Container>
       <Inner>
-        <Card nft={mockNFT} hideDetails />
-        <InputField placeholder="Enter receiver address" />
-        <Button>Send</Button>
+        {nft && (
+          <>
+            <Card nft={nft} hideDetails />
+            <InputField
+              placeholder="Enter receiver address"
+              value={address}
+              onChange={event => setAddress(event.target.value)}
+            />
+            <Button onClick={() => mainStore.sendToken(nft.id, address)}>
+              Send
+            </Button>
+          </>
+        )}
       </Inner>
     </Container>
   );
@@ -36,11 +58,10 @@ const Container = styled.div`
 `;
 
 const Inner = styled.div`
-  width: 500px;
-  height: 800px;
+  width: 400px;
   background-color: #fff;
   border-radius: 30px;
-  padding: 50px;
+  padding: 30px;
 `;
 
 const InputField = styled(TextInput)`

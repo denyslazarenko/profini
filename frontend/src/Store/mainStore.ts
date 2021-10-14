@@ -92,12 +92,14 @@ export class MainStore extends EventEmitter {
         const { from, id, to } = parsedEvent.args;
         if (from.toLowerCase() === this.ethAddress) {
           const tokenId = String(BigNumber.from(id).toNumber());
+          this.emit('Transfer');
           console.log('Sent a new token with id', tokenId);
         }
 
         if (to.toLowerCase() === this.ethAddress) {
           const tokenId = String(BigNumber.from(id).toNumber());
           console.log('Got a new token with id', tokenId);
+          this.emit('Transfer');
         }
       }
     });
@@ -305,5 +307,21 @@ export class MainStore extends EventEmitter {
     }
 
     return nfts;
+  }
+
+  async sendToken(id: number, to: string) {
+    if (!this.nftContractWrite) {
+      throw new Error('NFT contract not set up');
+    }
+
+    const result = await this.nftContractWrite.safeTransferFrom(
+      this.ethAddress,
+      to,
+      id,
+      1,
+      []
+    );
+
+    console.log('result', result);
   }
 }

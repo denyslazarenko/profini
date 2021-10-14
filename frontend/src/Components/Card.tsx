@@ -21,7 +21,7 @@ export const Card: React.FC<{
   // }, [nft]);
 
   return (
-    <Container grayed={!num || num === 0}>
+    <Container grayed={!!grayed}>
       {num && <Number>{num}</Number>}
       {hidden && <Hidden />}
       <Image src={nft.imageUrl} />
