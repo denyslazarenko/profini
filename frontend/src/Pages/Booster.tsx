@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Card } from '../Components/Card';
@@ -43,9 +43,15 @@ export const Booster = () => {
   const [revealed, setRevealed] = useState(0);
   const mainStore = MainStore.getInstance();
 
+  useEffect(() => {
+    mainStore.on('DrawPack', tokenIds => {
+      setState(BoosterState.HIDDEN);
+    });
+  }, []);
+
   const onBuyBooster = async () => {
     await mainStore.buyBooster();
-    setState(BoosterState.HIDDEN);
+    setState(BoosterState.IN_PROGRESS);
   };
 
   const onReveal = () => {
@@ -64,7 +70,7 @@ export const Booster = () => {
         </Inner>
       ) : state === BoosterState.IN_PROGRESS ? (
         <Inner>
-          <Headline>Please accept the transaction in MetaMask</Headline>
+          <Headline>Waiting....</Headline>
         </Inner>
       ) : state === BoosterState.HIDDEN ? (
         <Inner>

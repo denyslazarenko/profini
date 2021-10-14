@@ -1,14 +1,15 @@
 import axios from 'axios';
-import { ethers, utils } from 'ethers';
-import { makeAutoObservable } from 'mobx';
+import { BigNumber, ethers, utils } from 'ethers';
+import { action, makeObservable, observable } from 'mobx';
 import { CONFIG } from '../config';
 import { NFT, AddEthereumChainParameter } from '../types';
 import { BOOSTER_ABI } from './boosterAbi';
 import { NFT_ABI } from './nftAbi';
+import EventEmitter from 'events';
 
 const DEV = true;
 
-export class MainStore {
+export class MainStore extends EventEmitter {
   ethAddress: string | undefined;
   signer: any;
   provider: any;
@@ -21,7 +22,24 @@ export class MainStore {
   static instance: MainStore;
 
   constructor() {
-    makeAutoObservable(this);
+    super();
+    makeObservable(this, {
+      ethAddress: observable,
+      signer: observable,
+      provider: observable,
+      nftContractWrite: observable,
+      nftContractRead: observable,
+      boosterContractRead: observable,
+      boosterContractWrite: observable,
+      transferModalOpen: observable,
+      contractsReady: observable,
+      setupEventListeners: action,
+      loginMetamask: action,
+      setupContracts: action,
+      getTokenIds: action,
+      getTokenUris: action,
+      openTransferModal: action
+    });
     const metaMaskAvailable = localStorage.getItem('metamaskAvailable');
     console.log(metaMaskAvailable);
     if (metaMaskAvailable) this.loginMetamask();
@@ -35,33 +53,53 @@ export class MainStore {
   }
 
   setupEventListeners() {
+    const boosterInterface = new utils.Interface(BOOSTER_ABI);
+
     const boosterFilter = {
       address: CONFIG.BOOSTER_ADDRESS,
-      topics: [
-        // the name of the event, parnetheses containing the data type of each event, no spaces
-        utils.id('DrawPack(address,uint256[])')
-      ]
+      topics: [utils.id('DrawPack(address,uint256[])')]
     };
 
     this.provider.on(boosterFilter, (data: any) => {
-      console.log('RECEIVED BOOSTER EVENT DATA', data);
-      // do whatever you want here
-      // I'm pretty sure this returns a promise, so don't forget to resolve it
+      const parsedEvent = boosterInterface.parseLog(data) as any;
+      console.log('Parsed log', parsedEvent);
+
+      if (parsedEvent.name === 'DrawPack') {
+        const [address, _tokenIds] = parsedEvent.args;
+        console.log('address, token', address, _tokenIds);
+        if (address.toLowerCase() === this.ethAddress) {
+          const tokenIds = _tokenIds.map((id: any) =>
+            String(BigNumber.from(id).toNumber())
+          );
+          this.emit('DrawPack', tokenIds);
+          console.log('Got nfts from pack', tokenIds);
+        }
+      }
     });
 
     const nftFilter = {
       address: CONFIG.TOKEN_ADDRESS,
       topics: [
-        // the name of the event, parnetheses containing the data type of each event, no spaces
-        // TransferSingle(address operator, address from, address to, uint256 id, uint256 value)
         utils.id('TransferSingle(address,address,address,uint256,uint256)')
       ]
     };
-
+    const nftInterface = new utils.Interface(NFT_ABI);
     this.provider.on(nftFilter, (data: any) => {
-      console.log('RECEIVED NFT EVENT DATA', data);
-      // do whatever you want here
-      // I'm pretty sure this returns a promise, so don't forget to resolve it
+      const parsedEvent = nftInterface.parseLog(data) as any;
+      console.log('Parsed log', parsedEvent);
+
+      if (parsedEvent.name === 'TransferSingle') {
+        const { from, id, to } = parsedEvent.args;
+        if (from.toLowerCase() === this.ethAddress) {
+          const tokenId = String(BigNumber.from(id).toNumber());
+          console.log('Sent a new token with id', tokenId);
+        }
+
+        if (to.toLowerCase() === this.ethAddress) {
+          const tokenId = String(BigNumber.from(id).toNumber());
+          console.log('Got a new token with id', tokenId);
+        }
+      }
     });
   }
 
@@ -81,7 +119,8 @@ export class MainStore {
     console.log('result', result);
 
     if (result && result.length > 0) {
-      this.ethAddress = result[0];
+      this.ethAddress = result[0].toLowerCase();
+      console.log('ethaddress', this.ethAddress);
     } else {
       console.error('MetaMask login failed');
     }
@@ -135,12 +174,21 @@ export class MainStore {
     );
 
     this.contractsReady = true;
+    await this.setupEventListeners();
   }
 
   async getTokenIds() {
-    const ids = await this.nftContractRead?.tokenIds();
+    console.log('getting ids');
+    const ids = await this.nftContractRead?.tokenIDs();
     console.log('ids', ids, this.nftContractRead);
     return ids;
+  }
+
+  async getTokenUris() {
+    console.log('getting utis');
+    const uris = await this.nftContractRead?.uris();
+    console.log('utis', uris);
+    return uris;
   }
 
   async getTokenURI(id: number) {
@@ -224,7 +272,10 @@ export class MainStore {
     if (!this.boosterContractWrite)
       throw new Error('Booster contract not ready');
 
-    const transaction = await this.boosterContractWrite.drawPack();
+    const transaction = await this.boosterContractWrite.buyPack({
+      value: utils.parseEther('0.00001')
+    });
+
     const result = await transaction.wait();
     console.log('result', result);
   }
