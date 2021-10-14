@@ -24,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.get('/:addr', (req: Request, res: Response) => {
     const receiveAddr = req.params.addr;
+    console.log(utils.getAddress(receiveAddr));
     let tx = {
         to: receiveAddr,
         value: utils.parseEther('0.0001')
