@@ -158,7 +158,7 @@ export const Booster = () => {
                 flipDirection="horizontal"
                 flipSpeedFrontToBack={2.0}
               >
-                <Card nft={token} hidden hideDetails num={1} />
+                <Card nft={token} hidden={!(state === BoosterState.REVEALED && revealed >= index + 1)} hideDetails num={1} />
                 <Card nft={token} hideDetails num={1} />
               </ReactCardFlip>
             ))}
