@@ -245,36 +245,36 @@ export class MainStore extends EventEmitter {
 
     const params: [AddEthereumChainParameter] = DEV
       ? [
-          {
-            chainId: '0x13881',
-            chainName: 'Mumbai',
-            rpcUrls: [
-              // 'https://rpc-mainnet.matic.network/',
-              'https://rpc-mumbai.matic.today'
-            ],
-            nativeCurrency: {
-              name: 'Matic Token',
-              symbol: 'MATIC',
-              decimals: 18
-            }
+        {
+          chainId: '0x13881',
+          chainName: 'Mumbai',
+          rpcUrls: [
+            // 'https://rpc-mainnet.matic.network/',
+            'https://rpc-mumbai.matic.today'
+          ],
+          nativeCurrency: {
+            name: 'Matic Token',
+            symbol: 'MATIC',
+            decimals: 18
           }
-        ]
+        }
+      ]
       : [
-          {
-            chainId: '0x89',
-            chainName: 'Polygon',
-            rpcUrls: [
-              // 'https://rpc-mainnet.matic.network/',
-              'https://rpc-mainnet.maticvigil.com/',
-              'https://rpc-mainnet.matic.quiknode.pro'
-            ],
-            nativeCurrency: {
-              name: 'Matic Token',
-              symbol: 'MATIC',
-              decimals: 18
-            }
+        {
+          chainId: '0x89',
+          chainName: 'Polygon',
+          rpcUrls: [
+            // 'https://rpc-mainnet.matic.network/',
+            'https://rpc-mainnet.maticvigil.com/',
+            'https://rpc-mainnet.matic.quiknode.pro'
+          ],
+          nativeCurrency: {
+            name: 'Matic Token',
+            symbol: 'MATIC',
+            decimals: 18
           }
-        ];
+        }
+      ];
 
     await ethereum.request({
       method: 'wallet_addEthereumChain',
@@ -289,7 +289,7 @@ export class MainStore extends EventEmitter {
         throw new Error('Booster contract not ready');
 
       const transaction = await this.boosterContractWrite.buyPack({
-        value: utils.parseEther('0.00001')
+        value: utils.parseEther('2')
       });
 
       const result = await transaction.wait();
