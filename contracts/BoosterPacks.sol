@@ -11,14 +11,16 @@ contract BoosterPacks is Ownable, ERC1155Holder {
     mapping(string => uint256) private cardsClaimed;
     address private contractAddress;
 
-    mapping(string => uint256) private _vouchers;
+    mapping(bytes32 => uint256) private _vouchers;
 
     constructor(address _contractAddress) {
         contractAddress = _contractAddress;
     }
 
-    function setVoucher(string calldata voucher) external onlyOwner {
-        _vouchers[voucher] = 1;
+    function setVoucher(bytes32[] calldata vouchers) external onlyOwner {
+        for (uint256 i = 0; i < vouchers.length; i++) {
+            _vouchers[vouchers[i]] = 1;
+        }
     }
 
     function randomNumber(uint256 max) private view returns (uint256) {
@@ -42,7 +44,9 @@ contract BoosterPacks is Ownable, ERC1155Holder {
         drawPack();
     }
 
-    function claimPack(string calldata voucher) public {
+    function claimPack(string calldata preImage) public {
+        bytes32 voucher = keccak256(abi.encodePacked(preImage));
+
         require(_vouchers[voucher] == 1, "Voucher invalid or already used.");
 
         delete _vouchers[voucher];

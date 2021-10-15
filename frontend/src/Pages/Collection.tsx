@@ -1,10 +1,14 @@
+import { useEffect } from 'react';
 import styled from 'styled-components';
 import { CardGrid } from '../Components/CardGrid';
 import { ChairSection } from '../Components/ChairSection';
 import { VectorBackground } from '../Components/VectorBackground';
+import { useOwnNFTs } from '../Hooks/useOwnNFTs';
+import { MainStore } from '../Store/mainStore';
 import { NFT } from '../types';
 
 export const Collection: React.FC = () => {
+  const ownNfts = useOwnNFTs();
   return (
     <VectorBackground title={'Collection'}>
       <Container>
@@ -46,7 +50,7 @@ const UniLink = styled.a`
   font-size: 20px;
   color: #000000;
   display: block;
-  transition: ease-in-out .2s;
+  transition: ease-in-out 0.2s;
   :hover {
     color: #ad59f7;
   }
@@ -56,8 +60,8 @@ const Divider = styled.hr`
   border: 0;
   border-top: 2px solid #bbb;
   border-radius: 5px;
-`
+`;
 
 const UniTitle = styled.h1`
   padding-bottom: 30px;
-`
+`;

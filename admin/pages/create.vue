@@ -3,9 +3,17 @@
     <v-col cols="12" md="6">
       <v-card>
         <v-card-title> Information </v-card-title>
-        <v-select  v-model="rarity" :items="rarity_items" label="Rarity"></v-select>
-        <v-select v-model="university" :items="university_items" label="University"></v-select>
         <v-card-text>
+          <v-select
+            v-model="rarity"
+            :items="rarity_items"
+            label="Rarity"
+          ></v-select>
+          <v-select
+            v-model="university"
+            :items="university_items"
+            label="University"
+          ></v-select>
           <v-file-input
             v-model="input"
             accept="image/*"
@@ -15,8 +23,18 @@
           <v-text-field v-model="surname" label="Surname"></v-text-field>
           <v-text-field v-model="rank" label="Rank"></v-text-field>
           <v-text-field v-model="chair" label="Chair"></v-text-field>
+          <v-text-field v-model="semester" label="Semester"></v-text-field>
           <v-text-field v-model="book" label="Favourite book"></v-text-field>
           <v-text-field v-model="hobby" label="Favourite hobby"></v-text-field>
+          <v-divider class="my-6"></v-divider>
+          <v-text-field
+            v-model="tokenContract"
+            label="Booster Contract"
+          ></v-text-field>
+          <v-text-field
+            v-model="boosterContract"
+            label="Token Contract"
+          ></v-text-field>
           <v-divider class="my-6"></v-divider>
         </v-card-text>
         <v-card-actions>
@@ -26,17 +44,23 @@
               chainIdName[chainId] ? chainIdName[chainId] : 'Unknown'
             }}!</v-btn
           >
+          <v-btn @click="buyPack" color="primary">Get booster pack!</v-btn>
         </v-card-actions>
       </v-card>
     </v-col>
     <v-col cols="12" md="6">
-      <div id="capture" class="metacard-preview-container" :style="`background-image: url('/${rarity}.png');`">
+      <div
+        id="capture"
+        class="metacard-preview-container"
+        :style="`background-image: url('/${rarity}.png');`"
+      >
         <img class="preview-image" :src="image" />
         <img class="university-image" :src="`${university}.png`" />
         <div class="name">{{ name }}</div>
         <div class="surname">{{ surname }}</div>
         <div class="rank">{{ rank }}</div>
         <div class="chair">{{ chair }}</div>
+        <div class="semester">{{ semester }}</div>
         <div class="book">{{ book }}</div>
         <div class="hobby">{{ hobby }}</div>
       </div>
@@ -107,7 +131,11 @@ import html2canvas from 'html2canvas'
 import { NFTStorage, File } from 'nft.storage'
 import abis from '~/assets/abis'
 import connectProvider from '~/services/provider'
-import { unlockAddresses, chainIdName, mintProfiniAddress } from '~/assets/networks'
+import {
+  // unlockAddresses,
+  chainIdName,
+  // mintProfiniAddress,
+} from '~/assets/networks'
 
 // const Crypto = require('crypto')
 
@@ -129,6 +157,7 @@ export default {
       university: 'TUM',
       rank: '12',
       chair: 'chair',
+      semester: '',
       hindex: '11',
       book: 'book book book',
       hobby: 'hobbyhobby hobbyhobby hobby ',
@@ -142,26 +171,24 @@ export default {
       provider: null,
       signer: null,
       chainId: 0,
+      tokenAddress: '',
+      contractAddress: '',
       connected: false,
-      description: "fds",
+      description: 'fds',
       university_items: ['TUM', 'LMU'],
       rarity_items: ['Basic', 'Rare', 'Unique'],
-      rarityMapping: {'Basic': 10000, 'Rare': 100, 'Unique': 1},
+      rarityMapping: { Basic: 10000, Rare: 100, Unique: 1 },
       tasks: [
         {
           id: 1,
-          description: 'Uploading your card to IPFS...',
-        },
-        {
-          id: 2,
           description: 'Creating and uploading metadata...',
         },
         {
-          id: 3,
+          id: 2,
           description: 'Creating your contract...',
         },
         {
-          id: 4,
+          id: 3,
           description: 'Connecting contract to metadata...',
         },
       ],
@@ -198,6 +225,39 @@ export default {
       this.errorAtTask = this.currentTask
     },
 
+    async buyPack() {
+      console.log('start')
+      const boosterContract = new ethers.Contract(
+        this.mintAddress,
+        abis.BoosterPacks.abi,
+        this.provider
+      )
+
+      const signer = boosterContract.connect(this.signer)
+      console.log('draw pack')
+
+      let transaction
+      try {
+        transaction = await signer.buyPack({
+          value: ethers.utils.parseEther('0.000001'),
+        })
+      } catch (error) {
+        console.log(error)
+      }
+
+      console.log('awaiting tx')
+
+      let response
+      try {
+        response = await transaction.wait()
+      } catch (error) {
+        console.log(error)
+      }
+
+      console.log(`Submit transaction ${response}`)
+      console.log(response)
+    },
+
     async create() {
       this.loading = true
 
@@ -207,11 +267,8 @@ export default {
 
       canvas.toBlob(async (blob) => {
         try {
-          this.currentTask++
-
-
           const profiniContract = new ethers.Contract(
-            unlockAddresses[this.chainId],
+            this.tokenAddress,
             abis.Profini.abi,
             this.provider
           )
@@ -221,18 +278,36 @@ export default {
           const metadata = await client.store({
             name: `${this.collectionName}`,
             description: this.description,
-            image: new File(
-              [blob],
-              "image",
-             { type: 'image/jpg' }
-             ),
+            image: new File([blob], 'image', { type: 'image/jpg' }),
+            attribues: [
+              {
+                trait_type: 'University',
+                value: this.university,
+              },
+              {
+                trait_type: 'Rarity',
+                value: this.rarity,
+              },
+              {
+                trait_type: 'Rank',
+                value: this.rank,
+              },
+              {
+                trait_type: 'Chair',
+                value: this.chair,
+              },
+              {
+                trait_type: 'Semester',
+                value: this.semester,
+              },
+            ],
           })
 
           console.log(`base URI ${metadata}`)
           this.currentTask++
 
           const transaction = await signer.mint(
-            mintProfiniAddress,
+            this.boosterAddress,
             this.rarityMapping[this.rarity],
             metadata.url,
             []
@@ -245,6 +320,8 @@ export default {
           // ===========================
           this.loading = false
           this.success = true
+
+          this.currentTask = 0
         } catch (error) {
           console.log(error)
           this.errorHandler(error)

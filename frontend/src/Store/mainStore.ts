@@ -92,12 +92,14 @@ export class MainStore extends EventEmitter {
         const { from, id, to } = parsedEvent.args;
         if (from.toLowerCase() === this.ethAddress) {
           const tokenId = String(BigNumber.from(id).toNumber());
+          this.emit('Transfer');
           console.log('Sent a new token with id', tokenId);
         }
 
         if (to.toLowerCase() === this.ethAddress) {
           const tokenId = String(BigNumber.from(id).toNumber());
           console.log('Got a new token with id', tokenId);
+          this.emit('Transfer');
         }
       }
     });
@@ -283,5 +285,43 @@ export class MainStore extends EventEmitter {
   async openTransferModal(id: string) {
     console.log('open transfer modal');
     this.transferModalOpen = id;
+  }
+
+  async getOwnTokens(): Promise<{ [id: string]: number }> {
+    if (!this.nftContractRead) {
+      throw new Error('NFT contract not set up');
+    }
+
+    const nfts: { [id: string]: number } = {};
+
+    const allTokenIds = await this.getTokenIds();
+    const accounts = allTokenIds.map((_: any) => this.ethAddress);
+
+    const result = await this.nftContractRead.balanceOfBatch(
+      accounts,
+      allTokenIds
+    );
+
+    for (let i = 0; i < result.length; i++) {
+      nfts[allTokenIds[i]] = BigNumber.from(result[i]).toNumber();
+    }
+
+    return nfts;
+  }
+
+  async sendToken(id: number, to: string) {
+    if (!this.nftContractWrite) {
+      throw new Error('NFT contract not set up');
+    }
+
+    const result = await this.nftContractWrite.safeTransferFrom(
+      this.ethAddress,
+      to,
+      id,
+      1,
+      []
+    );
+
+    console.log('result', result);
   }
 }
