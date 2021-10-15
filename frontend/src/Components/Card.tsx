@@ -4,6 +4,7 @@ import { Button } from './Button';
 import { NFT } from '../types';
 import { getOpenSeaUrl } from '../Utils/utils';
 import { MainStore } from '../Store/mainStore';
+import Tilt from 'react-tilt'
 
 export const Card: React.FC<{
   nft: NFT;
@@ -20,27 +21,33 @@ export const Card: React.FC<{
           {num ? num + 'x' : 'not owned'}
         </Number>
       }
-      {hidden && <Hidden />}
-      <Image src={nft.imageUrl} owned={!!num} />
+      {!!num ? (
+        <Tilt className="Tilt" options={{ max : 25 }} style={{ width: "100%" }} >
+        {hidden && <Hidden />}
+      < Image src={nft.imageUrl} owned={!!num} />
+      </Tilt>
+      ) : (
+        < Image src={nft.imageUrl} owned={!!num} />
+      )}
       {!hideDetails ? (
-        <ButtonContainer>
-          <Button onClick={() => window.open(getOpenSeaUrl(nft.id))}>
-            View on OpenSea
-          </Button>
-          <Button
-            onClick={() => mainStore.openTransferModal(String(nft.id))}
-            disabled={!num}
-          >
-            Send
-          </Button>
-        </ButtonContainer>
-      ) : undefined}
+          <ButtonContainer>
+            <Button onClick={() => window.open(getOpenSeaUrl(nft.id))}>
+              View on OpenSea
+            </Button>
+            <Button
+              onClick={() => mainStore.openTransferModal(String(nft.id))}
+              disabled={!num}
+            >
+              Send
+            </Button>
+          </ButtonContainer>
+        ) : undefined}
     </Container>
   );
 };
 
 const Container = styled.div`
-  paddding: 10px;
+  padding: 10px;
   width: 100%;
   position: relative;
   justify-items: center;
