@@ -38,6 +38,9 @@ export const TransferModal = () => {
             <Button onClick={() => mainStore.sendToken(nft.id, address)}>
               Send
             </Button>
+            <Button onClick={() => mainStore.closeTransferModal()} secondary>
+              Cancel
+            </Button>
           </>
         )}
       </Inner>
@@ -51,7 +54,7 @@ const Container = styled.div`
   height: 100vh;
   top: 0;
   left: 0;
-  background-color: #000000aa;
+  background-color: #000000dd;
   display: grid;
   align-items: center;
   justify-items: center;
@@ -59,14 +62,16 @@ const Container = styled.div`
 
 const Inner = styled.div`
   width: 400px;
-  background-color: #fff;
+  // background-color: #fff;
   border-radius: 30px;
   padding: 30px;
+  display: grid;
+  grid-gap: 10px;
 `;
 
-const InputField = styled(TextInput)`
-  margin-top: 20px;
+const InputField = styled.input`
   border-radius: 10px;
-  margin-bottom: 10px;
   padding: 8px;
+  width: 100%;
+  border: 3px solid #fff;
 `;

@@ -19,7 +19,7 @@ export const Layout: React.FC = observer(() => {
           <Navbar />
           <Switch>
             <Route path="/collection">
-              <Collection />
+              <Marketplace />
             </Route>
             <Route path="/booster">
               <Booster />

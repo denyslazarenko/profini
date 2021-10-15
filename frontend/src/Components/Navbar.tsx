@@ -5,6 +5,7 @@ import { colors } from '../theme';
 import { MetaMaskButton } from 'rimble-ui';
 import { MainStore } from '../Store/mainStore';
 import { observer } from 'mobx-react-lite';
+import { CONFIG } from '../config';
 
 export const Navbar: React.FC = observer(() => {
   const mainStore = MainStore.getInstance();
@@ -12,7 +13,12 @@ export const Navbar: React.FC = observer(() => {
   return (
     <Bar>
       <Logo to="/">profini</Logo>
-      <MenuItem to="/">Marketplace</MenuItem>
+      <MenuLink
+        href={`${CONFIG.OPENSEA_URL}/collection/${CONFIG.OPENSEA_SLUG}`}
+        target="_blank"
+      >
+        Marketplace
+      </MenuLink>
       <MenuItem to="/collection">Collection</MenuItem>
       <MenuItem to="/booster">Booster</MenuItem>
       <MetaMaskButton
@@ -43,7 +49,7 @@ const Bar = styled.div`
   border-bottom: 1px solid #ffffff;
 `;
 
-const MenuButton = styled.p`
+const MenuLink = styled.a`
   font-weight: bold;
   color: #fff;
   text-decoration: none;

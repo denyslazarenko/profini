@@ -1,3 +1,4 @@
 export const colors = {
-  lightAccent: '#AF51FA'
+  lightAccent: '#AF51FA',
+  gray: '#eeeeee'
 };

@@ -38,7 +38,8 @@ export class MainStore extends EventEmitter {
       setupContracts: action,
       getTokenIds: action,
       getTokenUris: action,
-      openTransferModal: action
+      openTransferModal: action,
+      closeTransferModal: action
     });
     const metaMaskAvailable = localStorage.getItem('metamaskAvailable');
     console.log(metaMaskAvailable);
@@ -285,6 +286,10 @@ export class MainStore extends EventEmitter {
   async openTransferModal(id: string) {
     console.log('open transfer modal');
     this.transferModalOpen = id;
+  }
+
+  async closeTransferModal() {
+    this.transferModalOpen = undefined;
   }
 
   async getOwnTokens(): Promise<{ [id: string]: number }> {

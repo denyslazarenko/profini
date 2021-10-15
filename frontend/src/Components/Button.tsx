@@ -1,10 +1,10 @@
 import styled from 'styled-components';
 import { colors } from '../theme';
 
-export const Button = styled.div`
+export const Button = styled.div<{ secondary?: boolean }>`
   padding: 8px;
-  border: 1px solid ${colors.lightAccent};
-  color: ${colors.lightAccent};
+  border: 1px solid ${p => (p.secondary ? colors.gray : colors.lightAccent)};
+  color: ${p => (p.secondary ? colors.gray : colors.lightAccent)};
   border-radius: 10px;
   text-align: center;
   font-weight: bold;
@@ -12,8 +12,8 @@ export const Button = styled.div`
   cursor: pointer;
 
   :hover {
-    background-color: ${colors.lightAccent};
-    color: #fff;
+    background-color: ${p => (p.secondary ? colors.gray : colors.lightAccent)};
+    color: ${p => (p.secondary ? '#000' : '#fff')};
   }
 
   :active {
