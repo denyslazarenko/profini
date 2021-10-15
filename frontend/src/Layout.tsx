@@ -2,18 +2,20 @@ import React from 'react';
 import styled from 'styled-components';
 import { Navbar } from './Components/Navbar';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
-import { Collection } from './Pages/Collection';
 import { Marketplace } from './Pages/Marketplace';
 import { Booster } from './Pages/Booster';
 import { TransferModal } from './Pages/TransferModal';
 import { MainStore } from './Store/mainStore';
 import { observer } from 'mobx-react-lite';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export const Layout: React.FC = observer(() => {
   const mainStore = MainStore.getInstance();
   console.log('TransferModalOpen', mainStore.transferModalOpen);
   return (
     <>
+      <ToastContainer position="top-center" />
       <Container>
         <Router>
           <Navbar />
@@ -30,6 +32,7 @@ export const Layout: React.FC = observer(() => {
           </Switch>
         </Router>
       </Container>
+
       {mainStore.transferModalOpen && <TransferModal />}
     </>
   );

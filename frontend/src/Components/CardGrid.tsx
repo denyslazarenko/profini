@@ -25,4 +25,16 @@ const Container = styled.div`
   grid-template-columns: 1fr 1fr 1fr 1fr;
   grid-auto-flow: columns;
   grid-gap: 60px 20px;
+
+  @media screen and (max-width: 1000px) {
+    grid-template-columns: 1fr 1fr 1fr;
+  }
+
+  @media screen and (max-width: 700px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media screen and (max-width: 480px) {
+    grid-template-columns: 1fr;
+  }
 `;

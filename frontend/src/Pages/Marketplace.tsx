@@ -12,7 +12,7 @@ export const Marketplace: React.FC = () => {
 
   return (
     <Container>
-      <VectorBackground title={'Marketplace'}>
+      <VectorBackground title={'Collection'}>
         <CardGrid nfts={nfts} ownedNfts={ownedNfts} />
       </VectorBackground>
     </Container>

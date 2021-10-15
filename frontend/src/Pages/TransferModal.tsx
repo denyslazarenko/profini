@@ -31,7 +31,7 @@ export const TransferModal = () => {
           <>
             <Card nft={nft} hideDetails />
             <InputField
-              placeholder="Enter receiver address"
+              placeholder="Enter receiver wallet address"
               value={address}
               onChange={event => setAddress(event.target.value)}
             />

@@ -6,9 +6,13 @@ import { MetaMaskButton } from 'rimble-ui';
 import { MainStore } from '../Store/mainStore';
 import { observer } from 'mobx-react-lite';
 import { CONFIG } from '../config';
+import copy from 'copy-text-to-clipboard';
+import { toast } from 'react-toastify';
+import { useMediaQuery } from 'react-responsive';
 
 export const Navbar: React.FC = observer(() => {
   const mainStore = MainStore.getInstance();
+  const isMobile = useMediaQuery({ query: '(max-width: 1000px)' });
 
   return (
     <Bar>
@@ -24,7 +28,12 @@ export const Navbar: React.FC = observer(() => {
       <MetaMaskButton
         className="meta-mask-button"
         onClick={
-          !mainStore.ethAddress ? () => mainStore.loginMetamask() : undefined
+          !mainStore.ethAddress
+            ? () => mainStore.loginMetamask()
+            : () => {
+                copy(mainStore.ethAddress!);
+                toast.success('Wallet address copied to clipboard');
+              }
         }
       >
         {mainStore.ethAddress
@@ -47,6 +56,11 @@ const Bar = styled.div`
   padding: 10px;
   align-items: center;
   border-bottom: 1px solid #ffffff;
+
+  @media screen and (max-width: 1000px) {
+    grid-template-columns: 1fr;
+    text-align: center;
+  }
 `;
 
 const MenuLink = styled.a`
@@ -76,4 +90,12 @@ const MenuItem = styled(Link)`
 
 const Logo = styled(MenuItem)`
   font-size: 22px;
+`;
+
+const MenuButton = styled.div`
+  position: absolute;
+  font-size: 20px;
+  color: #fff;
+  top: 0;
+  right: 0;
 `;
