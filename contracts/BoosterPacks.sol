@@ -17,7 +17,7 @@ contract BoosterPacks is Ownable, ERC1155Holder {
         contractAddress = _contractAddress;
     }
 
-    function setVoucher(bytes32[] calldata vouchers) external onlyOwner {
+    function setVouchers(bytes32[] calldata vouchers) external onlyOwner {
         for (uint256 i = 0; i < vouchers.length; i++) {
             _vouchers[vouchers[i]] = 1;
         }
