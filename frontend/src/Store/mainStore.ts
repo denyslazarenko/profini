@@ -7,7 +7,7 @@ import { BOOSTER_ABI } from './boosterAbi';
 import { NFT_ABI } from './nftAbi';
 import EventEmitter from 'events';
 
-const DEV = true;
+const DEV = false;
 
 export class MainStore extends EventEmitter {
   ethAddress: string | undefined;
@@ -42,7 +42,8 @@ export class MainStore extends EventEmitter {
       getTokenUris: action,
       openTransferModal: action,
       closeTransferModal: action,
-      updateBalance: action
+      updateBalance: action,
+      getDrip: action
     });
     const metaMaskAvailable = localStorage.getItem('metamaskAvailable');
     console.log(metaMaskAvailable);
