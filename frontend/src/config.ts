@@ -1,8 +1,8 @@
 export const CONFIG = {
   TOKEN_ADDRESS: '0x268e54b2015Ca2911495E6f2F6f0d4fa446cF6e7',
   BOOSTER_ADDRESS: '0xd5B7551b6E95521cA7c9eF035C7C1484ebeAe804',
-  OPENSEA_URL: 'https://testnets.opensea.io',
-  OPENSEA_SLUG: 'unidentified-contract-mmpe1vzkle',
+  OPENSEA_URL: 'https://opensea.io',
+  OPENSEA_SLUG: 'profini',
   BACKEND: 'https://profini.herokuapp.com'
 };
 
