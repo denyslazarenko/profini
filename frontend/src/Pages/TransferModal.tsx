@@ -1,4 +1,4 @@
-import { TextInput } from 'grommet';
+import { Spinner, TextInput } from 'grommet';
 import { autorun } from 'mobx';
 import { useEffect, useState } from 'react';
 import styled from 'styled-components';
@@ -10,6 +10,8 @@ import { NFT } from '../types';
 export const TransferModal = () => {
   const [nft, setNft] = useState<NFT | undefined>(undefined);
   const [address, setAddress] = useState('');
+  const [sending, setSending] = useState(false);
+
   const mainStore = MainStore.getInstance();
   useEffect(
     () =>
@@ -24,9 +26,11 @@ export const TransferModal = () => {
     []
   );
 
-  const onSend = () => {
+  const onSend = async () => {
     if (!nft) return;
-    mainStore.sendToken(nft.id, address);
+    setSending(true);
+    await mainStore.sendToken(nft.id, address);
+    setSending(false);
     mainStore.closeTransferModal();
   };
 
@@ -36,11 +40,15 @@ export const TransferModal = () => {
         {nft && (
           <>
             <Card nft={nft} hideDetails num={1} />
-            <InputField
+            {sending ? (
+              <Spinner />
+            ) : (
+              <InputField
               placeholder="Enter receiver wallet address"
               value={address}
               onChange={event => setAddress(event.target.value)}
             />
+            )}
             <Button onClick={onSend}>Send</Button>
             <Button onClick={() => mainStore.closeTransferModal()} secondary>
               Cancel
@@ -53,7 +61,7 @@ export const TransferModal = () => {
 };
 
 const Container = styled.div`
-  position: absolute;
+  position: fixed;
   width: 100vw;
   height: 100vh;
   top: 0;
@@ -65,7 +73,7 @@ const Container = styled.div`
 `;
 
 const Inner = styled.div`
-  width: 400px;
+  width: 300px;
   // background-color: #fff;
   border-radius: 30px;
   padding: 30px;
