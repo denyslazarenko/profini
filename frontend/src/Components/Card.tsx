@@ -5,6 +5,8 @@ import { NFT } from '../types';
 import { getOpenSeaUrl } from '../Utils/utils';
 import { MainStore } from '../Store/mainStore';
 import Tilt from 'react-tilt'
+import { useState } from 'react';
+import Skeleton from 'react-loading-skeleton';
 
 export const Card: React.FC<{
   nft: NFT;
@@ -13,6 +15,12 @@ export const Card: React.FC<{
   num?: number;
 }> = ({ nft, hidden, hideDetails, num }) => {
   const mainStore = MainStore.getInstance();
+
+  const handleImageLoaded = () => {
+    setLoaded(true);
+  };
+
+  const [loaded, setLoaded] = useState(false);
 
   return (
     <Container>
@@ -24,10 +32,13 @@ export const Card: React.FC<{
       {!!num ? (
         <Tilt className="Tilt" options={{ max : 25 }} style={{ width: "100%" }} >
         {hidden && <Hidden />}
-      < Image src={nft.imageUrl} owned={!!num} />
+      <Image src={nft.imageUrl} owned={!!num} loaded={loaded} onLoad={handleImageLoaded} />
+      {!loaded ? (
+        <Skeleton width={"100%"} height={"200px"} />
+      ) : undefined}
       </Tilt>
       ) : (
-        < Image src={nft.imageUrl} owned={!!num} />
+        < Image src={nft.imageUrl} owned={!!num} loaded={loaded} onLoad={handleImageLoaded} />
       )}
       {!hideDetails ? (
           <ButtonContainer>
@@ -54,8 +65,8 @@ const Container = styled.div`
   align-items: center;
 `;
 
-const Image = styled.img<{ owned: boolean }>`
-  width: 100%;
+const Image = styled.img<{ owned: boolean, loaded: boolean }>`
+  ${p => p.loaded ? `width: 100%;` : 'width: 0%;'}
   border-radius: 16px;
   transition: ease-in-out 0.2s;
   ${p => (!p.owned ? 'filter: grayscale(100%) contrast(0.4);' : '')}
@@ -75,7 +86,7 @@ const Hidden = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  background-color: gray;
+  background-color: #8d218d;
 `;
 
 const ButtonContainer = styled.div`
