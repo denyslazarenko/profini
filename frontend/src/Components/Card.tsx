@@ -68,6 +68,7 @@ const Price = styled(P)`
 const Hidden = styled.div`
   width: 100%;
   height: 100%;
+  border-radius: 16px;
   position: absolute;
   top: 0;
   left: 0;

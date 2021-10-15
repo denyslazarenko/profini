@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Card } from '../Components/Card';
@@ -7,6 +7,8 @@ import { P } from '../Components/Text';
 import { MainStore } from '../Store/mainStore';
 import { colors } from '../theme';
 import { NFT } from '../types';
+import ReactCardFlip from 'react-card-flip';
+import { EmptyCard } from '../Components/EmptyCard';
 
 const ral = require("react-awesome-loaders");
 
@@ -66,6 +68,18 @@ export const Booster = () => {
 
   const onReveal = () => {
     setState(BoosterState.REVEALED);
+
+    console.log("Flipping 1st card");
+    setRevealed(1);
+
+    setTimeout(() => {
+      console.log("Flipping 2nd card");
+      setRevealed(2);
+    }, 2000);
+    setTimeout(() => {
+      console.log("Flipping 3rd card");
+      setRevealed(3);
+    }, 4000);
   };
 
   return (
@@ -86,27 +100,24 @@ export const Booster = () => {
             background={"#000"}
           />
         </Inner>
-      ) : state === BoosterState.HIDDEN ? (
+      ) : state === BoosterState.HIDDEN || BoosterState.REVEALED ? (
         <Inner>
           <CardGrid>
-            {tokens.map(token => (
-              <Card nft={token} hidden hideDetails />
+            {tokens.map((token, index) => (
+              <ReactCardFlip isFlipped={state === BoosterState.REVEALED && revealed >= index + 1 } flipDirection="horizontal" flipSpeedFrontToBack={2.0} >
+                <Card nft={token} hidden hideDetails />
+                <Card nft={token} hideDetails />
+              </ReactCardFlip>
             ))}
           </CardGrid>
 
-          <FancyButton onClick={onReveal}>Reveal</FancyButton>
-        </Inner>
-      ) : state === BoosterState.REVEALED ? (
-        <Inner>
-          <CardGrid>
-            {tokens.map(token => (
-              <Card nft={token} hideDetails />
-            ))}
-          </CardGrid>
-
-          <Nav to="/collection">
-            <FancyButton plain>Go to collection</FancyButton>
-          </Nav>
+          {state === BoosterState.HIDDEN ? (
+            <FancyButton onClick={onReveal}>Reveal</FancyButton>
+          ) : (
+            <Nav to="/collection">
+              <FancyButton plain>Go to collection</FancyButton>
+            </Nav>
+          )}
         </Inner>
       ) : undefined}
     </Container>
@@ -145,6 +156,7 @@ const Subheadline = styled(P)`
 `;
 
 const CardGrid = styled.div`
+  padding-top: 15px;
   display: grid;
   grid-auto-flow: row;
   grid-template-columns: 1fr 1fr 1fr;
@@ -152,6 +164,9 @@ const CardGrid = styled.div`
   grid-gap: 20px;
   margin-bottom: 20px;
 `;
+
+const CardFlipContainer = styled.div`
+`
 
 const Nav = styled(Link)`
   text-decoration: none;
