@@ -8,6 +8,8 @@ import { MainStore } from '../Store/mainStore';
 import { colors } from '../theme';
 import { NFT } from '../types';
 
+const ral = require("react-awesome-loaders");
+
 enum BoosterState {
   NOT_STARTED,
   IN_PROGRESS,
@@ -58,8 +60,8 @@ export const Booster = () => {
   }, []);
 
   const onBuyBooster = async () => {
-    await mainStore.buyBooster();
     setState(BoosterState.IN_PROGRESS);
+    await mainStore.buyBooster();
   };
 
   const onReveal = () => {
@@ -79,6 +81,10 @@ export const Booster = () => {
       ) : state === BoosterState.IN_PROGRESS ? (
         <Inner>
           <Headline>Waiting....</Headline>
+          <ral.ScatterBoxLoader
+            primaryColor={"#6366F1"}
+            background={"#000"}
+          />
         </Inner>
       ) : state === BoosterState.HIDDEN ? (
         <Inner>
@@ -98,8 +104,8 @@ export const Booster = () => {
             ))}
           </CardGrid>
 
-          <Nav to="/wallet">
-            <FancyButton plain>Go to wallet</FancyButton>
+          <Nav to="/collection">
+            <FancyButton plain>Go to collection</FancyButton>
           </Nav>
         </Inner>
       ) : undefined}
