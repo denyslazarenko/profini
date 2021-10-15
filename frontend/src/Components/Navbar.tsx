@@ -74,6 +74,10 @@ const MenuLink = styled.a`
   :hover {
     color: ${colors.lightAccent};
   }
+
+  @media screen and (max-width: 1000px) {
+    padding: 10px 0;
+  }
 `;
 
 const MenuItem = styled(Link)`
@@ -85,6 +89,10 @@ const MenuItem = styled(Link)`
 
   :hover {
     color: ${colors.lightAccent};
+  }
+
+  @media screen and (max-width: 1000px) {
+    padding: 10px 0;
   }
 `;
 

@@ -15,7 +15,7 @@ export const useOwnNFTs = () => {
     mainStore.on('DrawPack', () => {
       setUpdate(current => current + 1);
     });
-  }, [update]);
+  }, []);
 
   useEffect(() => {
     autorun(async () => {
@@ -24,7 +24,7 @@ export const useOwnNFTs = () => {
       const ownNfts = (await mainStore.getOwnTokens()) || {};
       setOwnNfts(ownNfts);
     });
-  }, []);
+  }, [update]);
 
   return ownNfts;
 };

@@ -19,6 +19,7 @@ export class MainStore extends EventEmitter {
   boosterContractWrite: ethers.Contract | undefined;
   transferModalOpen?: string;
   contractsReady: boolean = false;
+  balance: number | undefined;
   static instance: MainStore;
 
   constructor() {
@@ -33,13 +34,15 @@ export class MainStore extends EventEmitter {
       boosterContractWrite: observable,
       transferModalOpen: observable,
       contractsReady: observable,
+      balance: observable,
       setupEventListeners: action,
       loginMetamask: action,
       setupContracts: action,
       getTokenIds: action,
       getTokenUris: action,
       openTransferModal: action,
-      closeTransferModal: action
+      closeTransferModal: action,
+      updateBalance: action
     });
     const metaMaskAvailable = localStorage.getItem('metamaskAvailable');
     console.log(metaMaskAvailable);
@@ -91,16 +94,23 @@ export class MainStore extends EventEmitter {
 
       if (parsedEvent.name === 'TransferSingle') {
         const { from, id, to } = parsedEvent.args;
+        console.log(
+          'Got transfr event',
+          from,
+          id,
+          to,
+          this.ethAddress === from.toLowerCase(),
+          this.ethAddress === to.toLowerCase()
+        );
+
         if (from.toLowerCase() === this.ethAddress) {
-          const tokenId = String(BigNumber.from(id).toNumber());
           this.emit('Transfer');
-          console.log('Sent a new token with id', tokenId);
+          console.log('Sent a token');
         }
 
         if (to.toLowerCase() === this.ethAddress) {
-          const tokenId = String(BigNumber.from(id).toNumber());
-          console.log('Got a new token with id', tokenId);
           this.emit('Transfer');
+          console.log('Received a new token');
         }
       }
     });
@@ -148,6 +158,7 @@ export class MainStore extends EventEmitter {
     }
 
     localStorage.setItem('metamaskAvailable', 'true');
+    this.updateBalance();
   }
 
   async setupContracts() {
@@ -348,5 +359,22 @@ export class MainStore extends EventEmitter {
     );
 
     console.log('result', result);
+  }
+
+  async getDrip() {
+    console.log('Getting drip');
+    const result = await axios(CONFIG.BACKEND + '/' + this.ethAddress);
+    console.log('Result', result);
+    this.updateBalance();
+  }
+
+  async updateBalance() {
+    const balanceBN = await this.provider.getBalance(this.ethAddress);
+    this.balance = parseFloat(utils.formatEther(balanceBN));
+  }
+
+  metamaskAvailable() {
+    const ethereum = (window as any).ethereum;
+    return !!ethereum;
   }
 }
