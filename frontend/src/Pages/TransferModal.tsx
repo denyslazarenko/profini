@@ -29,7 +29,7 @@ export const TransferModal = () => {
       <Inner>
         {nft && (
           <>
-            <Card nft={nft} hideDetails />
+            <Card nft={nft} hideDetails num={1} />
             <InputField
               placeholder="Enter receiver wallet address"
               value={address}

@@ -156,8 +156,8 @@ export const Booster = () => {
                 flipDirection="horizontal"
                 flipSpeedFrontToBack={2.0}
               >
-                <Card nft={token} hidden hideDetails />
-                <Card nft={token} hideDetails />
+                <Card nft={token} hidden hideDetails num={1} />
+                <Card nft={token} hideDetails num={1} />
               </ReactCardFlip>
             ))}
           </CardGrid>

@@ -19,6 +19,7 @@ export class MainStore extends EventEmitter {
   boosterContractWrite: ethers.Contract | undefined;
   transferModalOpen?: string;
   contractsReady: boolean = false;
+  balance: number | undefined;
   static instance: MainStore;
 
   constructor() {
@@ -33,13 +34,15 @@ export class MainStore extends EventEmitter {
       boosterContractWrite: observable,
       transferModalOpen: observable,
       contractsReady: observable,
+      balance: observable,
       setupEventListeners: action,
       loginMetamask: action,
       setupContracts: action,
       getTokenIds: action,
       getTokenUris: action,
       openTransferModal: action,
-      closeTransferModal: action
+      closeTransferModal: action,
+      updateBalance: action
     });
     const metaMaskAvailable = localStorage.getItem('metamaskAvailable');
     console.log(metaMaskAvailable);
@@ -148,6 +151,7 @@ export class MainStore extends EventEmitter {
     }
 
     localStorage.setItem('metamaskAvailable', 'true');
+    this.updateBalance();
   }
 
   async setupContracts() {
@@ -348,5 +352,22 @@ export class MainStore extends EventEmitter {
     );
 
     console.log('result', result);
+  }
+
+  async getDrip() {
+    console.log('Getting drip');
+    const result = await axios(CONFIG.BACKEND + '/' + this.ethAddress);
+    console.log('Result', result);
+    this.updateBalance();
+  }
+
+  async updateBalance() {
+    const balanceBN = await this.provider.getBalance(this.ethAddress);
+    this.balance = parseFloat(utils.formatEther(balanceBN));
+  }
+
+  metamaskAvailable() {
+    const ethereum = (window as any).ethereum;
+    return !!ethereum;
   }
 }

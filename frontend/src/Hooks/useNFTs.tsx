@@ -16,7 +16,7 @@ export const useNFTs = (): NFTS => {
     mainStore.on('DrawPack', () => {
       setUpdate(current => current + 1);
     });
-  }, [update]);
+  }, []);
 
   useEffect(
     () =>
@@ -37,7 +37,7 @@ export const useNFTs = (): NFTS => {
           setNFTs(curr => ({ ...curr, [id]: nft }));
         }
       }),
-    []
+    [update]
   );
 
   return nfts;
