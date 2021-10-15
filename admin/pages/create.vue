@@ -28,12 +28,12 @@
           <v-text-field v-model="hobby" label="Favourite hobby"></v-text-field>
           <v-divider class="my-6"></v-divider>
           <v-text-field
-            v-model="tokenContract"
-            label="Booster Contract"
+            v-model="tokenAddress"
+            label="Profini Address"
           ></v-text-field>
           <v-text-field
-            v-model="boosterContract"
-            label="Token Contract"
+            v-model="boosterAddress"
+            label="Booster Address"
           ></v-text-field>
           <v-divider class="my-6"></v-divider>
         </v-card-text>
@@ -172,7 +172,7 @@ export default {
       signer: null,
       chainId: 0,
       tokenAddress: '',
-      contractAddress: '',
+      boosterAddress: '',
       connected: false,
       description: 'fds',
       university_items: ['TUM', 'LMU'],
@@ -228,7 +228,7 @@ export default {
     async buyPack() {
       console.log('start')
       const boosterContract = new ethers.Contract(
-        this.mintAddress,
+        this.boosterAddress,
         abis.BoosterPacks.abi,
         this.provider
       )

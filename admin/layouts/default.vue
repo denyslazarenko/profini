@@ -55,8 +55,8 @@ export default {
         },
         {
           icon: 'mdi-apps',
-          title: 'Upload card',
-          to: '/upload_image',
+          title: 'Upload cards',
+          to: '/upload',
         },
         {
           icon: 'mdi-apps',
