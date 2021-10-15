@@ -113,12 +113,14 @@ export const Booster = () => {
         <Inner>
           {showAirdropInput ? (
             <Headline>Claim free booster pack</Headline>
-          ) : (
+          ) : (<>
             <Headline>Buy booster pack</Headline>
-          )}
-          <Subheadline>
+            <Subheadline>
             A booster pack contains 3 random profini NFTs and costs 2 MATIC
           </Subheadline>
+          </>
+          )}
+          
           {showAirdropInput ? (
             <>
               <Input
