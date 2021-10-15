@@ -59,7 +59,7 @@ export const BOOSTER_ABI = [
     inputs: [
       {
         internalType: 'string',
-        name: 'voucher',
+        name: 'preImage',
         type: 'string'
       }
     ],
@@ -169,12 +169,12 @@ export const BOOSTER_ABI = [
   {
     inputs: [
       {
-        internalType: 'string',
-        name: 'voucher',
-        type: 'string'
+        internalType: 'bytes32[]',
+        name: 'vouchers',
+        type: 'bytes32[]'
       }
     ],
-    name: 'setVoucher',
+    name: 'setVouchers',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function'
@@ -209,6 +209,13 @@ export const BOOSTER_ABI = [
     name: 'transferOwnership',
     outputs: [],
     stateMutability: 'nonpayable',
+    type: 'function'
+  },
+  {
+    inputs: [],
+    name: 'withdraw',
+    outputs: [],
+    stateMutability: 'payable',
     type: 'function'
   }
 ];

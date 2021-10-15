@@ -50,6 +50,6 @@ const InnerWrapper = styled.div`
 const Inner = styled.div`
   background-color: #fff;
   min-height: 1000px;
-  border-radius: 40px;
+  border-radius: 10px;
   padding: 50px;
 `;

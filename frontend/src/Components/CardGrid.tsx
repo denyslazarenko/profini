@@ -9,12 +9,7 @@ export const CardGrid: React.FC<{
   return (
     <Container>
       {Object.values(nfts).map(nft => (
-        <Card
-          key={'nft' + nft.id}
-          nft={nft}
-          grayed={!ownedNfts[nft.id] || ownedNfts[nft.id] === 0}
-          num={ownedNfts[nft.id]}
-        />
+        <Card key={'nft' + nft.id} nft={nft} num={ownedNfts[nft.id]} />
       ))}
     </Container>
   );

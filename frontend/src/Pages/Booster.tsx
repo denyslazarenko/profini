@@ -16,7 +16,8 @@ enum BoosterState {
   NOT_STARTED,
   IN_PROGRESS,
   HIDDEN,
-  REVEALED
+  REVEALED,
+  ERROR
 }
 
 const mockNFTOpenSea = {
@@ -50,6 +51,8 @@ export const Booster = () => {
   const [showAirdropInput, setShowAirdropInput] = useState(false);
   const [airdropCode, setAirdropCode] = useState('');
 
+  console.log('booster state', state);
+
   useEffect(() => {
     const urlString = window.location.href;
     const url = new URL(urlString);
@@ -71,6 +74,11 @@ export const Booster = () => {
       setTokens(tempTokens);
       setState(BoosterState.HIDDEN);
     });
+
+    mainStore.on('Error', () => {
+      console.log('Received error');
+      setState(BoosterState.ERROR);
+    });
   }, []);
 
   const onBuyBooster = async () => {
@@ -80,7 +88,7 @@ export const Booster = () => {
 
   const onClaimBooster = async () => {
     setState(BoosterState.IN_PROGRESS);
-    await mainStore.buyBooster();
+    await mainStore.claimBooster(airdropCode);
   };
 
   const onReveal = () => {
@@ -137,7 +145,7 @@ export const Booster = () => {
           <Headline>Waiting....</Headline>
           <ral.ScatterBoxLoader primaryColor={'#6366F1'} background={'#000'} />
         </Inner>
-      ) : state === BoosterState.HIDDEN || BoosterState.REVEALED ? (
+      ) : state === BoosterState.HIDDEN || state === BoosterState.REVEALED ? (
         <Inner>
           <CardGrid>
             {tokens.map((token, index) => (
@@ -161,6 +169,13 @@ export const Booster = () => {
               <FancyButton plain>Go to collection</FancyButton>
             </Nav>
           )}
+        </Inner>
+      ) : state === BoosterState.ERROR ? (
+        <Inner>
+          <Headline>Invalid code :(</Headline>
+          <SmallTextButton onClick={() => setState(BoosterState.NOT_STARTED)}>
+            Try again
+          </SmallTextButton>
         </Inner>
       ) : undefined}
     </Container>

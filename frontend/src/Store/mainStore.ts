@@ -271,16 +271,36 @@ export class MainStore extends EventEmitter {
   }
 
   async buyBooster() {
-    console.log('buying booster');
-    if (!this.boosterContractWrite)
-      throw new Error('Booster contract not ready');
+    try {
+      console.log('buying booster');
+      if (!this.boosterContractWrite)
+        throw new Error('Booster contract not ready');
 
-    const transaction = await this.boosterContractWrite.buyPack({
-      value: utils.parseEther('0.00001')
-    });
+      const transaction = await this.boosterContractWrite.buyPack({
+        value: utils.parseEther('0.00001')
+      });
 
-    const result = await transaction.wait();
-    console.log('result', result);
+      const result = await transaction.wait();
+      console.log('result', result);
+    } catch (e) {
+      this.emit('Error');
+    }
+  }
+
+  async claimBooster(code: string) {
+    try {
+      console.log('claim booster');
+      if (!this.boosterContractWrite)
+        throw new Error('Booster contract not ready');
+
+      const transaction = await this.boosterContractWrite.claimPack(code);
+
+      const result = await transaction.wait();
+      console.log('result', result);
+    } catch (e) {
+      console.log('emitting error');
+      this.emit('Error');
+    }
   }
 
   async openTransferModal(id: string) {

@@ -2,7 +2,6 @@ import styled from 'styled-components';
 import { P } from './Text';
 import { Button } from './Button';
 import { NFT } from '../types';
-import { useMemo } from 'react';
 import { getOpenSeaUrl } from '../Utils/utils';
 import { MainStore } from '../Store/mainStore';
 
@@ -10,28 +9,28 @@ export const Card: React.FC<{
   nft: NFT;
   hidden?: boolean;
   hideDetails?: boolean;
-  grayed?: boolean;
   num?: number;
-}> = ({ nft, hidden, hideDetails, grayed, num }) => {
+}> = ({ nft, hidden, hideDetails, num }) => {
   const mainStore = MainStore.getInstance();
-  // const price = useMemo(() => {
-  //   if (nft.price) return nft.price + ' ETH';
-  //   if (nft.soldFor) return 'Sold for ' + nft.soldFor + ' ETH';
-  //   return 'unlisted';
-  // }, [nft]);
 
   return (
-    <Container grayed={!!grayed}>
-      {num && <Number>{num}</Number>}
+    <Container>
+      {
+        <Number title={`You own this card ${num} times`}>
+          {num ? num + 'x' : 'not owned'}
+        </Number>
+      }
       {hidden && <Hidden />}
-      <Image src={nft.imageUrl} />
+      <Image src={nft.imageUrl} owned={!!num} />
       {!hideDetails ? (
         <ButtonContainer>
-          {/* <Price>{price}</Price> */}
           <Button onClick={() => window.open(getOpenSeaUrl(nft.id))}>
             View on OpenSea
           </Button>
-          <Button onClick={() => mainStore.openTransferModal(String(nft.id))}>
+          <Button
+            onClick={() => mainStore.openTransferModal(String(nft.id))}
+            disabled={!num}
+          >
             Send
           </Button>
         </ButtonContainer>
@@ -40,29 +39,26 @@ export const Card: React.FC<{
   );
 };
 
-const Container = styled.div<{ grayed: boolean }>`
+const Container = styled.div`
   paddding: 10px;
   width: 100%;
   position: relative;
-  ${p => (p.grayed ? 'filter: grayscale(100%);' : '')}
+  justify-items: center;
+  align-items: center;
 `;
 
-const Image = styled.img`
+const Image = styled.img<{ owned: boolean }>`
   width: 100%;
   border-radius: 16px;
   transition: ease-in-out 0.2s;
-  :hover {
-    box-shadow: 5px 5px 10px 6px rgba(0, 0, 0, 0.25);
-    transform: translateY(-10px) scale(1.02);
-  }
-`;
-
-const Price = styled(P)`
-  color: #000;
-  font-weight: bold;
-  text-align: center;
-  margin: 10px 0;
-  font-size: 18px;
+  ${p => (!p.owned ? 'filter: grayscale(100%) contrast(0.4);' : '')}
+  ${p =>
+    p.owned
+      ? `:hover {
+      box-shadow: 5px 5px 10px 6px rgba(0, 0, 0, 0.25);
+      transform: translateY(-10px) scale(1.02);
+    }`
+      : ''}
 `;
 
 const Hidden = styled.div`
@@ -81,18 +77,13 @@ const ButtonContainer = styled.div`
   grid-gap: 8px;
 `;
 
-const Number = styled.div`
-  position: absolute;
-  background-color: #000;
-  width: 40px;
-  height: 40px;
-  border-radius: 20px;
-  left: -10px;
-  top: -10px;
-  opacity: 0.4;
+const Number = styled.p`
   display: grid;
   align-items: center;
   justify-items: center;
-  color: #fff;
+  color: #000;
   font-weight: bold;
+  text-align: center;
+  margin: 0 auto;
+  cursor: pointer;
 `;
