@@ -101,7 +101,7 @@ export default {
       //   const hash = ethers.utils.keccak256(test)
       //   console.log(hash)
 
-      const preImages = this.randomString(6, this.numVouchers)
+      const preImages = this.randomString(8, this.numVouchers)
 
       const hashes = preImages.map((e) =>
         ethers.utils.solidityKeccak256(['string'], [e])
