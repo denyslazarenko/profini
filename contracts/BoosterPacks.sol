@@ -6,7 +6,7 @@ import "./Ownable.sol";
 import "./ERC1155Holder.sol";
 
 contract BoosterPacks is Ownable, ERC1155Holder {
-    uint256 constant PRICE_PER_BOOSTER = 0.00001 ether;
+    uint256 constant PRICE_PER_BOOSTER = 2 ether;
     uint256 constant CARDS_PER_BOOSTER = 3;
     mapping(string => uint256) private cardsClaimed;
     address private contractAddress;
