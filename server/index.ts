@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import helmet from 'helmet';
+import cors from 'cors';
 import dotenv from 'dotenv';
 import { NFT_ABI } from './nftAbi';
 import { ethers, utils } from 'ethers';
@@ -19,6 +20,7 @@ const wallet: Wallet = new Wallet(PRIVATE_KEY, provider);
 const contract = new ethers.Contract(CONTRACT_ADDRESS, NFT_ABI, provider);
 
 app.use(helmet());
+app.use(cors())
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
