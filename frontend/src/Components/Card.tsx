@@ -29,7 +29,7 @@ export const Card: React.FC<{
           {num ? num + 'x' : 'not owned'}
         </Number>
       }
-      {!!num ? (
+      {(!!num && !hidden) ? (
       <Tilt className="Tilt" options={{ max : 25 }} style={{ width: "100%" }} >
         {hidden && <Hidden />}
         <Image src={nft.imageUrl} owned={!!num} loaded={loaded} onLoad={handleImageLoaded} />
