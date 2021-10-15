@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Card } from '../Components/Card';
@@ -7,12 +7,17 @@ import { P } from '../Components/Text';
 import { MainStore } from '../Store/mainStore';
 import { colors } from '../theme';
 import { NFT } from '../types';
+import ReactCardFlip from 'react-card-flip';
+import { EmptyCard } from '../Components/EmptyCard';
+
+const ral = require('react-awesome-loaders');
 
 enum BoosterState {
   NOT_STARTED,
   IN_PROGRESS,
   HIDDEN,
-  REVEALED
+  REVEALED,
+  ERROR
 }
 
 const mockNFTOpenSea = {
@@ -43,6 +48,20 @@ export const Booster = () => {
   const [revealed, setRevealed] = useState(0);
   const [tokens, setTokens] = useState<NFT[]>([]);
   const mainStore = MainStore.getInstance();
+  const [showAirdropInput, setShowAirdropInput] = useState(false);
+  const [airdropCode, setAirdropCode] = useState('');
+
+  console.log('booster state', state);
+
+  useEffect(() => {
+    const urlString = window.location.href;
+    const url = new URL(urlString);
+    const code = url.searchParams.get('code');
+    if (code) {
+      setShowAirdropInput(true);
+      setAirdropCode(code);
+    }
+  }, []);
 
   useEffect(() => {
     mainStore.on('DrawPack', async (tokenIds: string[]) => {
@@ -55,52 +74,108 @@ export const Booster = () => {
       setTokens(tempTokens);
       setState(BoosterState.HIDDEN);
     });
+
+    mainStore.on('Error', () => {
+      console.log('Received error');
+      setState(BoosterState.ERROR);
+    });
   }, []);
 
   const onBuyBooster = async () => {
-    await mainStore.buyBooster();
     setState(BoosterState.IN_PROGRESS);
+    await mainStore.buyBooster();
+  };
+
+  const onClaimBooster = async () => {
+    setState(BoosterState.IN_PROGRESS);
+    await mainStore.claimBooster(airdropCode);
   };
 
   const onReveal = () => {
     setState(BoosterState.REVEALED);
+
+    console.log('Flipping 1st card');
+    setRevealed(1);
+
+    setTimeout(() => {
+      console.log('Flipping 2nd card');
+      setRevealed(2);
+    }, 2000);
+    setTimeout(() => {
+      console.log('Flipping 3rd card');
+      setRevealed(3);
+    }, 4000);
   };
 
   return (
     <Container>
       {state === BoosterState.NOT_STARTED ? (
         <Inner>
-          <Headline>Buy booster pack</Headline>
+          {showAirdropInput ? (
+            <Headline>Claim free booster pack</Headline>
+          ) : (
+            <Headline>Buy booster pack</Headline>
+          )}
           <Subheadline>
-            A booster pack contains 5 random profini NFTs and costs 0.001 ETH
+            A booster pack contains 3 random profini NFTs and costs 2 MATIC
           </Subheadline>
-          <FancyButton onClick={onBuyBooster}>Buy now</FancyButton>
+          {showAirdropInput ? (
+            <>
+              <Input
+                placeholder="Enter your airdrop code"
+                value={airdropCode}
+                onChange={event => setAirdropCode(event.target.value)}
+              />
+              <FancyButton onClick={onClaimBooster}>Claim pack</FancyButton>
+              <SmallTextButton onClick={() => setShowAirdropInput(false)}>
+                Don't have an airdrop code?
+              </SmallTextButton>
+            </>
+          ) : (
+            <>
+              <FancyButton onClick={onBuyBooster}>Buy now</FancyButton>
+              <SmallTextButton onClick={() => setShowAirdropInput(true)}>
+                Got an airdrop code?
+              </SmallTextButton>
+            </>
+          )}
         </Inner>
       ) : state === BoosterState.IN_PROGRESS ? (
         <Inner>
           <Headline>Waiting....</Headline>
+          <ral.ScatterBoxLoader primaryColor={'#6366F1'} background={'#000'} />
         </Inner>
-      ) : state === BoosterState.HIDDEN ? (
+      ) : state === BoosterState.HIDDEN || state === BoosterState.REVEALED ? (
         <Inner>
           <CardGrid>
-            {tokens.map(token => (
-              <Card nft={token} hidden hideDetails />
+            {tokens.map((token, index) => (
+              <ReactCardFlip
+                isFlipped={
+                  state === BoosterState.REVEALED && revealed >= index + 1
+                }
+                flipDirection="horizontal"
+                flipSpeedFrontToBack={2.0}
+              >
+                <Card nft={token} hidden hideDetails num={1} />
+                <Card nft={token} hideDetails num={1} />
+              </ReactCardFlip>
             ))}
           </CardGrid>
 
-          <FancyButton onClick={onReveal}>Reveal</FancyButton>
+          {state === BoosterState.HIDDEN ? (
+            <FancyButton onClick={onReveal}>Reveal</FancyButton>
+          ) : (
+            <Nav to="/collection">
+              <FancyButton plain>Go to collection</FancyButton>
+            </Nav>
+          )}
         </Inner>
-      ) : state === BoosterState.REVEALED ? (
+      ) : state === BoosterState.ERROR ? (
         <Inner>
-          <CardGrid>
-            {tokens.map(token => (
-              <Card nft={token} hideDetails />
-            ))}
-          </CardGrid>
-
-          <Nav to="/wallet">
-            <FancyButton plain>Go to wallet</FancyButton>
-          </Nav>
+          <Headline>Invalid code :(</Headline>
+          <SmallTextButton onClick={() => setState(BoosterState.NOT_STARTED)}>
+            Try again
+          </SmallTextButton>
         </Inner>
       ) : undefined}
     </Container>
@@ -139,6 +214,7 @@ const Subheadline = styled(P)`
 `;
 
 const CardGrid = styled.div`
+  padding-top: 15px;
   display: grid;
   grid-auto-flow: row;
   grid-template-columns: 1fr 1fr 1fr;
@@ -146,6 +222,8 @@ const CardGrid = styled.div`
   grid-gap: 20px;
   margin-bottom: 20px;
 `;
+
+const CardFlipContainer = styled.div``;
 
 const Nav = styled(Link)`
   text-decoration: none;
@@ -157,4 +235,25 @@ const Nav = styled(Link)`
   div:hover {
     color: ${colors.lightAccent}!important;
   }
+`;
+
+const SmallTextButton = styled.p`
+  margin: 20px 0;
+  color: #fff;
+  cursor: pointer;
+  :hover {
+    text-decoration: underline;
+  }
+`;
+
+const Input = styled.input`
+  background-color: #000;
+  border: 3px solid #fff;
+  border-radius: 6px;
+  padding: 10px;
+  color: #fff;
+  font-weight: bold;
+  width: 100%;
+  font-size: 3vw;
+  text-align: center;
 `;

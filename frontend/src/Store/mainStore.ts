@@ -19,6 +19,7 @@ export class MainStore extends EventEmitter {
   boosterContractWrite: ethers.Contract | undefined;
   transferModalOpen?: string;
   contractsReady: boolean = false;
+  balance: number | undefined;
   static instance: MainStore;
 
   constructor() {
@@ -33,12 +34,15 @@ export class MainStore extends EventEmitter {
       boosterContractWrite: observable,
       transferModalOpen: observable,
       contractsReady: observable,
+      balance: observable,
       setupEventListeners: action,
       loginMetamask: action,
       setupContracts: action,
       getTokenIds: action,
       getTokenUris: action,
-      openTransferModal: action
+      openTransferModal: action,
+      closeTransferModal: action,
+      updateBalance: action
     });
     const metaMaskAvailable = localStorage.getItem('metamaskAvailable');
     console.log(metaMaskAvailable);
@@ -90,14 +94,23 @@ export class MainStore extends EventEmitter {
 
       if (parsedEvent.name === 'TransferSingle') {
         const { from, id, to } = parsedEvent.args;
+        console.log(
+          'Got transfr event',
+          from,
+          id,
+          to,
+          this.ethAddress === from.toLowerCase(),
+          this.ethAddress === to.toLowerCase()
+        );
+
         if (from.toLowerCase() === this.ethAddress) {
-          const tokenId = String(BigNumber.from(id).toNumber());
-          console.log('Sent a new token with id', tokenId);
+          this.emit('Transfer');
+          console.log('Sent a token');
         }
 
         if (to.toLowerCase() === this.ethAddress) {
-          const tokenId = String(BigNumber.from(id).toNumber());
-          console.log('Got a new token with id', tokenId);
+          this.emit('Transfer');
+          console.log('Received a new token');
         }
       }
     });
@@ -145,6 +158,7 @@ export class MainStore extends EventEmitter {
     }
 
     localStorage.setItem('metamaskAvailable', 'true');
+    this.updateBalance();
   }
 
   async setupContracts() {
@@ -268,20 +282,99 @@ export class MainStore extends EventEmitter {
   }
 
   async buyBooster() {
-    console.log('buying booster');
-    if (!this.boosterContractWrite)
-      throw new Error('Booster contract not ready');
+    try {
+      console.log('buying booster');
+      if (!this.boosterContractWrite)
+        throw new Error('Booster contract not ready');
 
-    const transaction = await this.boosterContractWrite.buyPack({
-      value: utils.parseEther('0.00001')
-    });
+      const transaction = await this.boosterContractWrite.buyPack({
+        value: utils.parseEther('0.00001')
+      });
 
-    const result = await transaction.wait();
-    console.log('result', result);
+      const result = await transaction.wait();
+      console.log('result', result);
+    } catch (e) {
+      this.emit('Error');
+    }
+  }
+
+  async claimBooster(code: string) {
+    try {
+      console.log('claim booster');
+      if (!this.boosterContractWrite)
+        throw new Error('Booster contract not ready');
+
+      const transaction = await this.boosterContractWrite.claimPack(code);
+
+      const result = await transaction.wait();
+      console.log('result', result);
+    } catch (e) {
+      console.log('emitting error');
+      this.emit('Error');
+    }
   }
 
   async openTransferModal(id: string) {
     console.log('open transfer modal');
     this.transferModalOpen = id;
+  }
+
+  async closeTransferModal() {
+    this.transferModalOpen = undefined;
+  }
+
+  async getOwnTokens(): Promise<{ [id: string]: number }> {
+    if (!this.nftContractRead) {
+      throw new Error('NFT contract not set up');
+    }
+
+    const nfts: { [id: string]: number } = {};
+
+    const allTokenIds = await this.getTokenIds();
+    const accounts = allTokenIds.map((_: any) => this.ethAddress);
+
+    const result = await this.nftContractRead.balanceOfBatch(
+      accounts,
+      allTokenIds
+    );
+
+    for (let i = 0; i < result.length; i++) {
+      nfts[allTokenIds[i]] = BigNumber.from(result[i]).toNumber();
+    }
+
+    return nfts;
+  }
+
+  async sendToken(id: number, to: string) {
+    if (!this.nftContractWrite) {
+      throw new Error('NFT contract not set up');
+    }
+
+    const result = await this.nftContractWrite.safeTransferFrom(
+      this.ethAddress,
+      to,
+      id,
+      1,
+      []
+    );
+
+    console.log('result', result);
+  }
+
+  async getDrip() {
+    console.log('Getting drip');
+    const result = await axios(CONFIG.BACKEND + '/' + this.ethAddress);
+    console.log('Result', result);
+    this.updateBalance();
+  }
+
+  async updateBalance() {
+    const balanceBN = await this.provider.getBalance(this.ethAddress);
+    this.balance = parseFloat(utils.formatEther(balanceBN));
+  }
+
+  metamaskAvailable() {
+    const ethereum = (window as any).ethereum;
+    return !!ethereum;
   }
 }
