@@ -117,7 +117,7 @@ export const Booster = () => {
             <Headline>Buy booster pack</Headline>
           )}
           <Subheadline>
-            A booster pack contains 5 random profini NFTs and costs 0.001 ETH
+            A booster pack contains 3 random profini NFTs and costs 2 MATIC
           </Subheadline>
           {showAirdropInput ? (
             <>
