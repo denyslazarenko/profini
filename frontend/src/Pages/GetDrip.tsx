@@ -6,7 +6,8 @@ import { MainStore } from '../Store/mainStore';
 
 enum State {
   NOT_STARTED,
-  WAITING
+  WAITING,
+  DONE
 }
 
 export const GetDrip = () => {
@@ -16,9 +17,10 @@ export const GetDrip = () => {
   const onRequestDrip = async () => {
     setState(State.WAITING);
     await mainStore.getDrip();
+    setState(State.DONE);
   };
 
-  return (
+  return state === State.DONE ? null : (
     <Container>
       <Inner>
         {state === State.NOT_STARTED ? (

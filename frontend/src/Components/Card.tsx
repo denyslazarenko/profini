@@ -30,14 +30,12 @@ export const Card: React.FC<{
         </Number>
       }
       {!!num ? (
-        <Tilt className="Tilt" options={{ max : 25 }} style={{ width: "100%" }} >
-      <Image src={nft.imageUrl} owned={!!num} loaded={loaded} onLoad={handleImageLoaded} />
-      {!loaded ? (
-        <Skeleton width={"100%"} height={"200px"} />
-      ) : undefined}
+      <Tilt className="Tilt" options={{ max : 25 }} style={{ width: "100%" }} >
+        {hidden && <Hidden />}
+        <Image src={nft.imageUrl} owned={!!num} loaded={loaded} onLoad={handleImageLoaded} />
       </Tilt>
       ) : (
-        < Image src={nft.imageUrl} owned={!!num} loaded={loaded} onLoad={handleImageLoaded} />
+        <Image src={nft.imageUrl} owned={!!num} loaded={loaded} onLoad={handleImageLoaded} />
       )}
       {!hideDetails ? (
           <ButtonContainer>
@@ -65,7 +63,7 @@ const Container = styled.div`
 `;
 
 const Image = styled.img<{ owned: boolean, loaded: boolean }>`
-  ${p => p.loaded ? `width: 100%;` : 'width: 0%;'}
+  width: 100%;
   border-radius: 16px;
   transition: ease-in-out 0.2s;
   ${p => (!p.owned ? 'filter: grayscale(100%) contrast(0.4);' : '')}

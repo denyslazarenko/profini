@@ -367,6 +367,7 @@ export class MainStore extends EventEmitter {
     const result = await axios(CONFIG.BACKEND + '/' + this.ethAddress);
     console.log('Result', result);
     this.updateBalance();
+    this.emit("Gotdrip");
   }
 
   async updateBalance() {
