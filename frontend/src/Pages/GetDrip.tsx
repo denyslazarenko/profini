@@ -60,6 +60,12 @@ const Headline = styled.h1`
   font-weight: bold;
   text-transform: uppercase;
   text-align: center;
+
+  @media screen and (max-width: 1000px) {
+    grid-template-columns: 1fr;
+    text-align: center;
+    font-size: 10vw;
+  }
 `;
 
 const Subheadline = styled(P)`
