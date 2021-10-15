@@ -24,6 +24,12 @@ export const TransferModal = () => {
     []
   );
 
+  const onSend = () => {
+    if (!nft) return;
+    mainStore.sendToken(nft.id, address);
+    mainStore.closeTransferModal();
+  };
+
   return (
     <Container>
       <Inner>
@@ -35,9 +41,7 @@ export const TransferModal = () => {
               value={address}
               onChange={event => setAddress(event.target.value)}
             />
-            <Button onClick={() => mainStore.sendToken(nft.id, address)}>
-              Send
-            </Button>
+            <Button onClick={onSend}>Send</Button>
             <Button onClick={() => mainStore.closeTransferModal()} secondary>
               Cancel
             </Button>

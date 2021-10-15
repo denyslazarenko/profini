@@ -94,16 +94,23 @@ export class MainStore extends EventEmitter {
 
       if (parsedEvent.name === 'TransferSingle') {
         const { from, id, to } = parsedEvent.args;
+        console.log(
+          'Got transfr event',
+          from,
+          id,
+          to,
+          this.ethAddress === from.toLowerCase(),
+          this.ethAddress === to.toLowerCase()
+        );
+
         if (from.toLowerCase() === this.ethAddress) {
-          const tokenId = String(BigNumber.from(id).toNumber());
           this.emit('Transfer');
-          console.log('Sent a new token with id', tokenId);
+          console.log('Sent a token');
         }
 
         if (to.toLowerCase() === this.ethAddress) {
-          const tokenId = String(BigNumber.from(id).toNumber());
-          console.log('Got a new token with id', tokenId);
           this.emit('Transfer');
+          console.log('Received a new token');
         }
       }
     });
